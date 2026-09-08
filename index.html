@@ -1329,6 +1329,8 @@ body.session-active .top-login-btn {
 body.view-admin .admin-catalog-only { display: block !important; }
 body.view-admin .admin-summary-only { display: flex !important; }
 body.view-admin .admin-history-only { display: block !important; }
+body.view-payroll #payrollPanel { display: block !important; }
+body.view-void-actions .sale-detail-admin-actions.admin-detail-only { display: flex !important; }
 
 body.view-admin .table-head,
 body.view-admin .service-row {
@@ -3625,6 +3627,46 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
+
+/* ===== PERMISOS / CÓDIGO DIARIO DE ANULACIONES ===== */
+.void-code-panel {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 14px;
+  border: 1px solid #2d3a34;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(63,211,90,.055), rgba(8,13,16,.94));
+}
+.void-code-panel[hidden] { display: none !important; }
+.void-code-panel strong {
+  display: block;
+  margin: 2px 0 3px;
+  color: #68ea91;
+  font-size: 22px;
+  letter-spacing: .22em;
+}
+.void-code-actions { display: flex; gap: 8px; align-items: center; }
+.void-code-entry-card { width: min(430px, 94vw); }
+.void-code-entry-field { margin-top: 12px; }
+#voidCodeEntryInput {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .32em;
+  font-size: 18px;
+  font-weight: 950;
+}
+.readonly-admin-view .admin-price-input,
+.payroll-readonly input,
+.payroll-readonly select {
+  opacity: .78;
+}
+@media (max-width: 640px) {
+  .void-code-panel { grid-template-columns: 1fr; }
+  .void-code-actions { justify-content: flex-start; flex-wrap: wrap; }
+}
+
 /* ===== V13: MENÚ MÁS LIMPIO ===== */
 .account-menu-dropdown button strong {
   text-transform: uppercase;
@@ -3656,17 +3698,17 @@ body.view-admin .admin-detail-only { display: block !important; }
           <div id="accountMenuDropdown" class="account-menu-dropdown" hidden>
             <div class="account-menu-section-label">Actividad</div>
 
-            <button type="button" data-account-view="history" class="mechanic-menu-only" hidden>
+            <button type="button" data-account-view="my-history" class="mechanic-menu-only" hidden>
               <span><strong>Mis ventas</strong><small>Historial semanal</small></span>
               <span class="account-menu-chevron">›</span>
             </button>
 
-            <button type="button" data-account-view="records" class="admin-menu-only" hidden>
+            <button type="button" data-account-view="records" data-permission="records" class="admin-menu-only" hidden>
               <span><strong>Registros</strong><small>Todas las ventas del taller</small></span>
               <span class="account-menu-chevron">›</span>
             </button>
 
-            <button type="button" data-account-view="history" class="admin-menu-only" hidden>
+            <button type="button" data-account-view="history" data-permission="team-view" class="admin-menu-only" hidden>
               <span><strong>Equipo</strong><small>Personal, historial y nómina</small></span>
               <span class="account-menu-chevron">›</span>
             </button>
@@ -3674,12 +3716,12 @@ body.view-admin .admin-detail-only { display: block !important; }
             <div class="account-menu-divider admin-menu-only" hidden></div>
             <div class="account-menu-section-label admin-menu-only" hidden>Administración</div>
 
-            <button type="button" data-account-view="prices" class="admin-menu-only" hidden>
+            <button type="button" data-account-view="prices" data-permission="prices-view" class="admin-menu-only" hidden>
               <span><strong>Precios</strong><small>Compra y venta</small></span>
               <span class="account-menu-chevron">›</span>
             </button>
 
-            <button type="button" data-account-view="agreements" class="admin-menu-only" hidden>
+            <button type="button" data-account-view="agreements" data-permission="agreements-view" class="admin-menu-only" hidden>
               <span><strong>Convenios</strong><small>Organizaciones y descuentos</small></span>
               <span class="account-menu-chevron">›</span>
             </button>
@@ -4132,6 +4174,18 @@ body.view-admin .admin-detail-only { display: block !important; }
             </div>
           </div>
 
+          <section id="voidCodeAdminPanel" class="void-code-panel" hidden>
+            <div>
+              <div class="history-week-caption">Código de anulaciones</div>
+              <strong id="voidCodeValue">Sin generar</strong>
+              <div id="voidCodeMeta" class="admin-user">Genera un código de 6 caracteres. Será válido hasta terminar el día.</div>
+            </div>
+            <div class="void-code-actions">
+              <button id="copyVoidCodeBtn" class="admin-secondary" type="button" hidden>Copiar</button>
+              <button id="generateVoidCodeBtn" class="admin-primary" type="button">Generar código</button>
+            </div>
+          </section>
+
           <div>
             <div class="history-week-caption">Semanas</div>
             <div id="recordsWeekTabs" class="history-week-tabs"></div>
@@ -4422,6 +4476,30 @@ body.view-admin .admin-detail-only { display: block !important; }
             <span>Registrar venta</span>
             <small>Guardar en historial</small>
           </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="voidCodeEntryOverlay" class="sale-overlay" aria-hidden="true">
+    <section class="sale-card void-code-entry-card" role="dialog" aria-modal="true" aria-labelledby="voidCodeEntryTitle">
+      <div class="sale-head">
+        <div>
+          <div class="sale-eyebrow">Autorización temporal</div>
+          <div id="voidCodeEntryTitle" class="sale-title">Código para anular venta</div>
+        </div>
+        <button id="voidCodeEntryClose" class="quick-close" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="sale-body">
+        <p class="sale-order-discount">Ingresa el código de 6 caracteres generado hoy por Gerencia, Jefe de mecánicos o Administrador.</p>
+        <div class="admin-field void-code-entry-field">
+          <label for="voidCodeEntryInput">Código del día</label>
+          <input id="voidCodeEntryInput" type="text" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC123" />
+        </div>
+        <div id="voidCodeEntryStatus" class="admin-status" aria-live="polite"></div>
+        <div class="sale-actions-refined">
+          <button id="voidCodeEntryCancel" class="admin-secondary" type="button">Cancelar</button>
+          <button id="voidCodeEntryConfirm" class="admin-primary" type="button">Autorizar anulación</button>
         </div>
       </div>
     </section>
@@ -5502,6 +5580,7 @@ const userCreatorAuth = getAuth(userCreatorApp);
 const pricesRef = doc(db, 'config', 'topgear_prices');
 const agreementsRef = doc(db, 'config', 'topgear_agreements');
 const positionsRef = doc(db, 'config', 'topgear_positions');
+const voidCodeRef = doc(db, 'config', 'topgear_void_code');
 
 const launcher = document.querySelector('#adminLauncher');
 const overlay = document.querySelector('#adminOverlay');
@@ -5616,6 +5695,11 @@ const mechanicMenuOnlyItems = [...document.querySelectorAll('.mechanic-menu-only
 const historyPanel = document.querySelector('#historyPanel');
 const adminRecordsPanel = document.querySelector('#adminRecordsPanel');
 const recordsBack = document.querySelector('#recordsBack');
+const voidCodeAdminPanel = document.querySelector('#voidCodeAdminPanel');
+const voidCodeValue = document.querySelector('#voidCodeValue');
+const voidCodeMeta = document.querySelector('#voidCodeMeta');
+const generateVoidCodeBtn = document.querySelector('#generateVoidCodeBtn');
+const copyVoidCodeBtn = document.querySelector('#copyVoidCodeBtn');
 const recordsSearch = document.querySelector('#recordsSearch');
 const showVoidedRecords = document.querySelector('#showVoidedRecords');
 const recordsWeekTabs = document.querySelector('#recordsWeekTabs');
@@ -5672,6 +5756,12 @@ const salePlate = document.querySelector('#salePlate');
 const saleStatus = document.querySelector('#saleStatus');
 
 const saleDetailOverlay = document.querySelector('#saleDetailOverlay');
+const voidCodeEntryOverlay = document.querySelector('#voidCodeEntryOverlay');
+const voidCodeEntryClose = document.querySelector('#voidCodeEntryClose');
+const voidCodeEntryCancel = document.querySelector('#voidCodeEntryCancel');
+const voidCodeEntryConfirm = document.querySelector('#voidCodeEntryConfirm');
+const voidCodeEntryInput = document.querySelector('#voidCodeEntryInput');
+const voidCodeEntryStatus = document.querySelector('#voidCodeEntryStatus');
 const saleDetailClose = document.querySelector('#saleDetailClose');
 const detailCustomer = document.querySelector('#detailCustomer');
 const detailPlate = document.querySelector('#detailPlate');
@@ -5699,6 +5789,7 @@ let mechanicProfiles = [];
 let loadedSales = [];
 let selectedHistoryUserId = null;
 let selectedHistoryUserName = '';
+let historyContext = 'self';
 let selectedWeekKey = null;
 let selectedRecordsWeekKey = null;
 let lastKnownCurrentWeekKey = null;
@@ -5723,10 +5814,11 @@ let unsubscribeAgreements = null;
 
 function defaultPositionsConfig() {
   return [
-    { id: 'workshop-boss', name: 'Jefe de taller', baseSalary: 2200, commissionPercent: 7, active: true },
     { id: 'management', name: 'Gerencia', baseSalary: 2500, commissionPercent: 5, active: true },
-    { id: 'mechanic', name: 'Mecánico', baseSalary: 1600, commissionPercent: 8, active: true },
-    { id: 'trial-mechanic', name: 'Mecánico de prueba', baseSalary: 1000, commissionPercent: 5, active: true },
+    { id: 'mechanic-chief', name: 'Jefe de mecánicos', baseSalary: 2200, commissionPercent: 6, active: true },
+    { id: 'workshop-boss', name: 'Jefe de taller', baseSalary: 1900, commissionPercent: 7, active: true },
+    { id: 'senior-mechanic', name: 'Mecánico experimentado', baseSalary: 1600, commissionPercent: 8, active: true },
+    { id: 'trial-mechanic', name: 'Mecánico en pruebas', baseSalary: 1000, commissionPercent: 5, active: true },
   ];
 }
 
@@ -5753,17 +5845,47 @@ function applyPositionsConfig(list) {
   fillNewMechanicPositionOptions();
   renderMechanicDirectory();
   if (!adminPositionsPanel.hidden) renderPositionsAdminList();
-  if (!historyPanel.hidden && currentRole === 'admin' && selectedHistoryUserId) renderPayrollPanel();
+  if (!historyPanel.hidden && hasPermission('payroll-view') && selectedHistoryUserId) renderPayrollPanel();
 }
 
 function getPositionById(id) {
   return positionCatalog.find(item => item.id === id) || null;
 }
 
-function positionLabelFromProfile(profile) {
-  const found = getPositionById(profile?.positionId);
-  return found?.name || 'Sin puesto';
+function normalizePositionId(id) {
+  const value = String(id || '').trim();
+  if (value === 'mechanic') return 'senior-mechanic'; // compatibilidad con perfiles viejos
+  if (value === 'supervisor') return 'mechanic-chief'; // compatibilidad con el rango anterior
+  return value;
 }
+
+function positionLabelFromProfile(profile) {
+  const normalizedId = normalizePositionId(profile?.positionId);
+  const found = getPositionById(normalizedId);
+  return found?.name || (normalizedId === 'senior-mechanic' ? 'Mecánico experimentado' : 'Sin puesto');
+}
+
+const POSITION_PERMISSIONS = {
+  management: new Set(['records','team-view','team-manage','prices-view','prices-edit','agreements-view','agreements-add','agreements-edit','payroll-view','payroll-edit','positions-edit','void-direct','void-code-generate']),
+  'mechanic-chief': new Set(['records','team-view','team-manage','prices-view','agreements-view','agreements-add','payroll-view','void-direct','void-code-generate']),
+  'workshop-boss': new Set(['records','team-view','void-code-use']),
+  'senior-mechanic': new Set([]),
+  'trial-mechanic': new Set([]),
+};
+
+function permissionPositionId(profile = currentProfile) {
+  return normalizePositionId(profile?.positionId);
+}
+
+function hasPermission(permission, profile = currentProfile, role = currentRole) {
+  if (String(role || '').toLowerCase() === 'admin') return true;
+  return POSITION_PERMISSIONS[permissionPositionId(profile)]?.has(permission) || false;
+}
+
+function canReadAllSales() { return hasPermission('records'); }
+function canDirectVoidSales() { return hasPermission('void-direct'); }
+function canUseVoidCode() { return hasPermission('void-code-use'); }
+function canGenerateVoidCode() { return hasPermission('void-code-generate'); }
 
 function fillPayrollPositionOptions(selectedId = null) {
   if (!payrollPosition) return;
@@ -5799,7 +5921,7 @@ adminBack.addEventListener('click', () => {
   setAccountView(adminBackView);
 });
 teamPositionsBtn.addEventListener('click', () => {
-  setAccountView('positions');
+  if (hasPermission('positions-edit')) setAccountView('positions');
 });
 
 function finishInitialPriceLoad() {
@@ -5922,6 +6044,17 @@ function buildEditor(config = latestConfig) {
     ));
   });
   sections.appendChild(packageBlock);
+  applyPriceEditorPermissions();
+}
+
+function applyPriceEditorPermissions() {
+  const canEdit = hasPermission('prices-edit');
+  editor.classList.toggle('readonly-admin-view', !canEdit);
+  sections.querySelectorAll('.admin-price-input').forEach(input => {
+    input.disabled = !canEdit;
+  });
+  saveBtn.hidden = !canEdit;
+  if (!canEdit) setStatus(saveStatus, 'Vista de solo lectura.');
 }
 
 function collectEditorConfig() {
@@ -5957,6 +6090,7 @@ loginForm.addEventListener('submit', async event => {
 });
 
 async function closeSession() {
+  workshopBossVoidAuthorized = false;
   try { await signOut(auth); } catch (error) { console.error(error); }
 }
 adminHomeLogout.addEventListener('click', closeSession);
@@ -5982,6 +6116,7 @@ function currentMechanicPositionLabel() {
 }
 
 function openPositionEditor(id = null) {
+  if (!hasPermission('positions-edit')) return;
   positionEditorState.editingId = id;
   const item = id ? (positionCatalog.find(entry => entry.id === id) || null) : null;
 
@@ -6081,6 +6216,7 @@ async function persistPositionsConfig(nextPositions, statusMessage = 'Puestos ac
 }
 
 savePositionBtn.addEventListener('click', async () => {
+  if (!hasPermission('positions-edit')) return;
   const name = positionNameInput.value.trim();
   const baseSalary = Math.max(0, Math.round(Number(positionBaseInput.value) || 0));
   const commissionPercent = Math.max(0, Number(positionCommissionInput.value) || 0);
@@ -6113,7 +6249,7 @@ savePositionBtn.addEventListener('click', async () => {
 });
 
 deletePositionBtn.addEventListener('click', async () => {
-  if (!positionEditorState.editingId) return;
+  if (!hasPermission('positions-edit') || !positionEditorState.editingId) return;
   if (!window.confirm('¿Eliminar este puesto?')) return;
 
   try {
@@ -6128,7 +6264,7 @@ deletePositionBtn.addEventListener('click', async () => {
 
 
 async function bootstrapFirebaseConfigIfAdmin() {
-  if (currentRole !== 'admin' || !auth.currentUser) return;
+  if (!hasPermission('positions-edit') || !auth.currentUser) return;
 
   try {
     const [priceSnap, agreementSnap, positionSnap] = await Promise.all([
@@ -6158,11 +6294,33 @@ async function bootstrapFirebaseConfigIfAdmin() {
           positionsRef,
           {
             positions: clonePositionsConfig(),
+            schemaVersion: 3,
             updatedAt: serverTimestamp(),
           },
           { merge: true }
         )
       );
+    } else {
+      const positionData = positionSnap.data() || {};
+      const existingPositions = Array.isArray(positionData.positions) ? positionData.positions : [];
+      const byId = Object.fromEntries(existingPositions.map(item => [String(item.id || ''), item]));
+      const needsMigration = Number(positionData.schemaVersion || 0) < 3
+        || !byId['mechanic-chief']
+        || !byId['senior-mechanic']
+        || Boolean(byId.supervisor)
+        || Boolean(byId.mechanic);
+
+      if (needsMigration) {
+        const defaults = Object.fromEntries(defaultPositionsConfig().map(item => [item.id, item]));
+        const migrated = [
+          { ...defaults.management, ...(byId.management || {}) },
+          { ...defaults['mechanic-chief'], ...(byId['mechanic-chief'] || byId.supervisor || {}), id: 'mechanic-chief', name: 'Jefe de mecánicos' },
+          { ...defaults['workshop-boss'], ...(byId['workshop-boss'] || {}), name: 'Jefe de taller' },
+          { ...defaults['senior-mechanic'], ...(byId['senior-mechanic'] || byId.mechanic || {}), id: 'senior-mechanic', name: 'Mecánico experimentado' },
+          { ...defaults['trial-mechanic'], ...(byId['trial-mechanic'] || {}), name: 'Mecánico en pruebas' },
+        ];
+        writes.push(setDoc(positionsRef, { positions: migrated, schemaVersion: 3, updatedAt: serverTimestamp() }, { merge: true }));
+      }
     }
 
     if (!agreementSnap.exists()) {
@@ -6293,7 +6451,8 @@ function renderAgreementsAdminList() {
         edit.type = 'button';
         edit.className = 'agreements-edit-btn';
         edit.textContent = 'Editar';
-        edit.addEventListener('click', () => openAgreementEditor(item.id, group.id));
+        edit.hidden = !hasPermission('agreements-edit');
+        edit.addEventListener('click', () => { if (hasPermission('agreements-edit')) openAgreementEditor(item.id, group.id); });
 
         row.append(logo, main, percent, edit);
         section.appendChild(row);
@@ -6339,6 +6498,8 @@ function resetAgreementEditor() {
 }
 
 function openAgreementEditor(id = null, groupId = null) {
+  if (id && !hasPermission('agreements-edit')) return;
+  if (!id && !hasPermission('agreements-add')) return;
   resetAgreementEditor();
 
   if (id && groupId) {
@@ -6452,6 +6613,9 @@ async function persistAgreementsConfig(config) {
 }
 
 saveAgreementBtn.addEventListener('click', async () => {
+  const isEditingAgreement = Boolean(agreementEditorState.editingId);
+  if (isEditingAgreement && !hasPermission('agreements-edit')) return;
+  if (!isEditingAgreement && !hasPermission('agreements-add')) return;
   const name = agreementNameInput.value.trim();
   const groupId = agreementGroupInput.value;
   const discount = Math.max(0, Math.min(100, Number(agreementDiscountInput.value) || 0));
@@ -6503,6 +6667,7 @@ saveAgreementBtn.addEventListener('click', async () => {
 });
 
 deleteAgreementBtn.addEventListener('click', async () => {
+  if (!hasPermission('agreements-edit')) return;
   const id = agreementEditorState.editingId;
   if (!id) return;
 
@@ -6668,47 +6833,57 @@ function setAccountView(view) {
 
   hideAllAccountPanels();
 
-  if (view === 'records' && currentRole === 'admin') {
+  if (view === 'records' && hasPermission('records')) {
     adminRecordsPanel.hidden = false;
     setAdminHeader('Registros', 'Todas las ventas del taller');
     selectedRecordsWeekKey = currentWeekKey();
     showVoidedRecords.checked = false;
     refreshAdminRecordsView();
+    refreshVoidCodePanel();
+
+  } else if (view === 'my-history') {
+    historyContext = 'self';
+    historyPanel.hidden = false;
+    selectedHistoryUserId = effectiveUser()?.uid || null;
+    selectedHistoryUserName = saleDisplayName();
+    selectedMechanicProfile = currentProfile ? { uid: effectiveUser()?.uid, ...currentProfile } : null;
+    selectedWeekKey = getWeekKey(new Date());
+    setAdminHeader('Mis ventas', currentProfile?.name || positionLabelFromProfile(currentProfile) || 'Personal');
+    refreshHistoryView();
+    if (hasPermission('payroll-view')) loadPayrollRecord();
 
   } else if (view === 'history') {
-    if (currentRole === 'admin') {
+    if (hasPermission('team-view')) {
+      historyContext = 'team';
       adminMechanicsPanel.hidden = false;
       setMechanicCreateOpen(false);
       closeMechanicEdit();
-      setAdminHeader('Equipo', 'Personal contratado', null, 'positions');
+      setAdminHeader('Equipo', 'Personal contratado', null, hasPermission('positions-edit') ? 'positions' : null);
       selectedHistoryUserId = null;
       selectedHistoryUserName = '';
       selectedMechanicProfile = null;
       setMechanicCreateOpen(false);
       renderMechanicDirectory();
     } else {
-      historyPanel.hidden = false;
-      selectedHistoryUserId = effectiveUser()?.uid || null;
-      selectedHistoryUserName = saleDisplayName();
-      selectedWeekKey = getWeekKey(new Date());
-      setAdminHeader('Mis ventas', currentProfile?.name || 'Mecánico');
-      refreshHistoryView();
+      setAccountView('my-history');
+      return;
     }
 
-  } else if (view === 'prices' && currentRole === 'admin') {
+  } else if (view === 'prices' && hasPermission('prices-view')) {
     editor.hidden = false;
     const currentPriceConfig = latestConfig && latestConfig.services
       ? latestConfig
       : window.stopCarAdminAPI.getPriceConfig();
     buildEditor(currentPriceConfig);
-    setAdminHeader('Precios', 'Compra, venta y ganancia');
+    setAdminHeader('Precios', hasPermission('prices-edit') ? 'Compra, venta y ganancia' : 'Consulta de precios · solo lectura');
 
-  } else if (view === 'agreements' && currentRole === 'admin') {
+  } else if (view === 'agreements' && hasPermission('agreements-view')) {
     adminAgreementsPanel.hidden = false;
-    setAdminHeader('Convenios', 'Organizaciones y descuentos');
+    setAdminHeader('Convenios', hasPermission('agreements-edit') ? 'Organizaciones y descuentos' : 'Consulta y alta de convenios');
+    newAgreementBtn.hidden = !hasPermission('agreements-add');
     renderAgreementsAdminList();
 
-  } else if (view === 'positions' && currentRole === 'admin') {
+  } else if (view === 'positions' && hasPermission('positions-edit')) {
     adminPositionsPanel.hidden = false;
     setAdminHeader('Puestos', 'Jerarquías y nómina base', 'history');
     renderPositionsAdminList();
@@ -6728,7 +6903,7 @@ agreementsAdminBack.addEventListener('click', () => setAccountView('account'));
 recordsBack.addEventListener('click', () => setAccountView('account'));
 mechanicsBack.addEventListener('click', () => setAccountView('account'));
 historyBack.addEventListener('click', () => {
-  if (currentRole === 'admin') {
+  if (historyContext === 'team' && hasPermission('team-view')) {
     adminMechanicsPanel.hidden = false;
     historyPanel.hidden = true;
     adminTitle.textContent = 'Equipo';
@@ -6738,6 +6913,141 @@ historyBack.addEventListener('click', () => {
   }
 });
 
+
+let latestVoidCode = null;
+let workshopBossVoidAuthorized = false;
+
+function endOfTodayLocal() {
+  const d = new Date();
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
+function randomVoidCode(length = 6) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = new Uint32Array(length);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, n => chars[n % chars.length]).join('');
+}
+
+function openVoidCodeEntry(open) {
+  voidCodeEntryOverlay.classList.toggle('is-open', open);
+  voidCodeEntryOverlay.setAttribute('aria-hidden', String(!open));
+  if (open) {
+    voidCodeEntryInput.value = '';
+    setStatus(voidCodeEntryStatus, '');
+    setTimeout(() => voidCodeEntryInput.focus(), 60);
+  }
+}
+
+voidCodeEntryClose.addEventListener('click', () => openVoidCodeEntry(false));
+voidCodeEntryCancel.addEventListener('click', () => openVoidCodeEntry(false));
+voidCodeEntryOverlay.addEventListener('click', event => { if (event.target === voidCodeEntryOverlay) openVoidCodeEntry(false); });
+voidCodeEntryInput.addEventListener('input', () => {
+  voidCodeEntryInput.value = voidCodeEntryInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+});
+
+async function authorizeWorkshopBossVoid() {
+  if (!canUseVoidCode() || !auth.currentUser) return false;
+  const code = voidCodeEntryInput.value.trim().toUpperCase();
+  if (code.length !== 6) {
+    setStatus(voidCodeEntryStatus, 'Escribe los 6 caracteres del código.', 'error');
+    return false;
+  }
+
+  voidCodeEntryConfirm.disabled = true;
+  setStatus(voidCodeEntryStatus, 'Validando código…');
+  try {
+    await setDoc(doc(db, 'void_access', auth.currentUser.uid), {
+      userId: auth.currentUser.uid,
+      code,
+      grantedAt: serverTimestamp(),
+      grantedAtClient: new Date().toISOString(),
+    });
+    workshopBossVoidAuthorized = true;
+    setStatus(voidCodeEntryStatus, 'Código correcto. Puedes anular ventas mientras este código siga vigente.', 'ok');
+    setTimeout(async () => {
+      openVoidCodeEntry(false);
+      await performSelectedSaleVoidChange();
+    }, 350);
+    return true;
+  } catch (error) {
+    console.error(error);
+    setStatus(voidCodeEntryStatus, 'Código incorrecto, vencido o ya reemplazado.', 'error');
+    return false;
+  } finally {
+    voidCodeEntryConfirm.disabled = false;
+  }
+}
+voidCodeEntryConfirm.addEventListener('click', authorizeWorkshopBossVoid);
+voidCodeEntryInput.addEventListener('keydown', event => { if (event.key === 'Enter') authorizeWorkshopBossVoid(); });
+
+async function refreshVoidCodePanel() {
+  if (!voidCodeAdminPanel) return;
+  const allowed = canGenerateVoidCode();
+  voidCodeAdminPanel.hidden = !allowed;
+  if (!allowed) return;
+
+  try {
+    const snap = await getDoc(voidCodeRef);
+    if (!snap.exists()) {
+      latestVoidCode = null;
+      voidCodeValue.textContent = 'Sin generar';
+      voidCodeMeta.textContent = 'Genera un código de 6 caracteres. Será válido hasta terminar el día.';
+      copyVoidCodeBtn.hidden = true;
+      generateVoidCodeBtn.textContent = 'Generar código';
+      return;
+    }
+    const data = snap.data();
+    const expires = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAtClient || 0);
+    const valid = data.code && expires.getTime() > Date.now();
+    latestVoidCode = valid ? String(data.code) : null;
+    voidCodeValue.textContent = valid ? latestVoidCode : 'Vencido';
+    voidCodeMeta.textContent = valid
+      ? `Válido hoy hasta ${expires.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}. Si generas otro, el anterior deja de funcionar.`
+      : 'El código anterior ya venció. Genera uno nuevo para hoy.';
+    copyVoidCodeBtn.hidden = !valid;
+    generateVoidCodeBtn.textContent = valid ? 'Generar otro' : 'Generar código';
+  } catch (error) {
+    console.error(error);
+    voidCodeMeta.textContent = 'No pude leer el código del día.';
+  }
+}
+
+generateVoidCodeBtn.addEventListener('click', async () => {
+  if (!canGenerateVoidCode()) return;
+  const code = randomVoidCode();
+  const expiresAt = endOfTodayLocal();
+  generateVoidCodeBtn.disabled = true;
+  try {
+    await setDoc(voidCodeRef, {
+      code,
+      expiresAt,
+      expiresAtClient: expiresAt.toISOString(),
+      generatedAt: serverTimestamp(),
+      generatedAtClient: new Date().toISOString(),
+      generatedBy: auth.currentUser?.uid || '',
+    }, { merge: true });
+    latestVoidCode = code;
+    await refreshVoidCodePanel();
+  } catch (error) {
+    console.error(error);
+    voidCodeMeta.textContent = 'No se pudo generar el código.';
+  } finally {
+    generateVoidCodeBtn.disabled = false;
+  }
+});
+
+copyVoidCodeBtn.addEventListener('click', async () => {
+  if (!latestVoidCode) return;
+  try {
+    await navigator.clipboard.writeText(latestVoidCode);
+    copyVoidCodeBtn.textContent = 'Copiado ✓';
+    setTimeout(() => { copyVoidCodeBtn.textContent = 'Copiar'; }, 1100);
+  } catch {
+    window.prompt('Copia el código:', latestVoidCode);
+  }
+});
 
 function openSaleDetail(open) {
   saleDetailOverlay.classList.toggle('is-open', open);
@@ -6811,17 +7121,23 @@ function showSaleDetail(sale) {
   detailStatus.textContent = isVoid
     ? `Venta anulada${sale.voidReason ? ` · ${sale.voidReason}` : ''}`
     : 'Venta activa';
-  toggleSaleVoid.hidden = currentRole !== 'admin';
+  toggleSaleVoid.hidden = !(canDirectVoidSales() || canUseVoidCode());
   toggleSaleVoid.classList.toggle('is-restore', isVoid);
   toggleSaleVoid.textContent = isVoid ? 'Restaurar venta' : 'Anular venta';
+  if (isVoid && !canDirectVoidSales()) toggleSaleVoid.hidden = true;
 
   openSaleDetail(true);
 }
 
-async function toggleSelectedSaleVoid() {
-  if (currentRole !== 'admin' || !selectedSaleDetail?.id) return;
-
+async function performSelectedSaleVoidChange() {
+  if (!selectedSaleDetail?.id) return;
   const isVoid = selectedSaleDetail.status === 'void';
+  if (isVoid && !canDirectVoidSales()) {
+    detailStatus.classList.add('is-void');
+    detailStatus.textContent = 'Solo Gerencia, Jefe de mecánicos o Administrador pueden restaurar ventas.';
+    return;
+  }
+
   let reason = '';
   if (!isVoid) {
     const confirmed = window.confirm('¿Anular esta venta? Dejará de contar en totales, ganancias y nómina.');
@@ -6859,9 +7175,29 @@ async function toggleSelectedSaleVoid() {
   } catch (error) {
     console.error(error);
     detailStatus.classList.add('is-void');
-    detailStatus.textContent = 'No se pudo actualizar esta venta.';
+    const permissionDenied = String(error?.code || '').includes('permission-denied');
+    if (permissionDenied && canUseVoidCode()) workshopBossVoidAuthorized = false;
+    detailStatus.textContent = permissionDenied
+      ? 'El código ya no es válido. Ingresa el código vigente para volver a autorizar anulaciones.'
+      : 'No se pudo actualizar esta venta.';
+    if (permissionDenied && canUseVoidCode()) setTimeout(() => openVoidCodeEntry(true), 250);
   } finally {
     toggleSaleVoid.disabled = false;
+  }
+}
+
+async function toggleSelectedSaleVoid() {
+  if (!selectedSaleDetail?.id) return;
+  if (canDirectVoidSales()) {
+    await performSelectedSaleVoidChange();
+    return;
+  }
+  if (canUseVoidCode() && selectedSaleDetail.status !== 'void') {
+    if (workshopBossVoidAuthorized) {
+      await performSelectedSaleVoidChange();
+    } else {
+      openVoidCodeEntry(true);
+    }
   }
 }
 
@@ -7132,9 +7468,10 @@ function selectedWeekSalesRaw() {
 }
 
 function profilePayrollDefaults(profile) {
-  const position = getPositionById(profile?.positionId) || getPositionById('mechanic');
+  const normalizedProfilePosition = normalizePositionId(profile?.positionId);
+  const position = getPositionById(normalizedProfilePosition) || getPositionById('senior-mechanic');
   return {
-    positionId: profile?.positionId || position?.id || 'mechanic',
+    positionId: normalizedProfilePosition || position?.id || 'senior-mechanic',
     positionName: position?.name || 'Mecánico',
     baseSalary: Math.max(0, Number(position?.baseSalary ?? 0) || 0),
     commissionPercent: Math.max(0, Number(position?.commissionPercent ?? 0) || 0),
@@ -7165,7 +7502,7 @@ function payrollCalculation() {
 }
 
 function renderPayrollPanel() {
-  if (currentRole !== 'admin' || !selectedHistoryUserId || !selectedWeekKey) return;
+  if (!hasPermission('payroll-view') || !selectedHistoryUserId || !selectedWeekKey) return;
 
   const profile = selectedMechanicProfile
     || mechanicProfiles.find(p => p.uid === selectedHistoryUserId)
@@ -7185,6 +7522,14 @@ function renderPayrollPanel() {
   payrollBankAccount.value = record?.bankAccount ?? defaults.bankAccount ?? '';
   payrollPaymentMethod.value = record?.paymentMethod || '';
 
+  const canEditPayroll = hasPermission('payroll-edit');
+  payrollPanel.classList.toggle('payroll-readonly', !canEditPayroll);
+  payrollPosition.disabled = !canEditPayroll;
+  payrollBankAccount.disabled = !canEditPayroll;
+  savePayrollSettings.hidden = !canEditPayroll;
+  markPayrollPaid.hidden = !canEditPayroll;
+  reopenPayroll.hidden = !canEditPayroll;
+
   const calc = payrollCalculation();
   payrollBasePreview.textContent = formatMoney(calc.base);
   payrollCommissionPreview.textContent = formatMoney(calc.commission);
@@ -7198,9 +7543,11 @@ function renderPayrollPanel() {
   markPayrollPaid.textContent = paid ? 'Pago registrado' : 'Marcar como pagado';
   markPayrollPaid.disabled = paid;
   payrollPaymentMethod.disabled = paid;
-  reopenPayroll.hidden = !paid;
+  reopenPayroll.hidden = !paid || !canEditPayroll;
 
-  if (paid) {
+  if (!canEditPayroll) {
+    setStatus(payrollStatus, paid ? 'Nómina registrada · solo lectura.' : 'Vista de nómina · solo lectura.');
+  } else if (paid) {
     const method = record.paymentMethod === 'transfer' ? 'Transferencia'
       : record.paymentMethod === 'cash' ? 'Efectivo'
       : 'Sin método';
@@ -7215,7 +7562,7 @@ function renderPayrollPanel() {
 }
 
 function updatePayrollPreview() {
-  if (currentRole !== 'admin') return;
+  if (!hasPermission('payroll-view')) return;
   const calc = payrollCalculation();
   payrollBasePreview.textContent = formatMoney(calc.base);
   payrollCommissionPreview.textContent = formatMoney(calc.commission);
@@ -7234,9 +7581,9 @@ payrollPosition.addEventListener('change', () => {
 });
 
 async function persistMechanicPayrollSettings() {
-  if (!selectedHistoryUserId) return;
+  if (!hasPermission('payroll-edit') || !selectedHistoryUserId) return;
 
-  const positionId = payrollPosition.value || 'mechanic';
+  const positionId = payrollPosition.value || 'senior-mechanic';
   const bankAccount = payrollBankAccount.value.trim().slice(0, 10);
 
   const profile = mechanicProfiles.find(p => p.uid === selectedHistoryUserId);
@@ -7261,7 +7608,7 @@ async function persistMechanicPayrollSettings() {
 savePayrollSettings.addEventListener('click', persistMechanicPayrollSettings);
 
 async function markSelectedPayrollPaid() {
-  if (!selectedHistoryUserId || !selectedWeekKey) return;
+  if (!hasPermission('payroll-edit') || !selectedHistoryUserId || !selectedWeekKey) return;
 
   const paymentMethod = payrollPaymentMethod.value;
   if (!paymentMethod) {
@@ -7280,8 +7627,8 @@ async function markSelectedPayrollPaid() {
     weeklyProfit: calc.profit,
     commissionAmount: calc.commission,
     salaryTotal: calc.total,
-    positionId: payrollPosition.value || 'mechanic',
-    positionName: getPositionById(payrollPosition.value || 'mechanic')?.name || 'Mecánico',
+    positionId: payrollPosition.value || 'senior-mechanic',
+    positionName: getPositionById(payrollPosition.value || 'senior-mechanic')?.name || 'Mecánico experimentado',
     bankAccount: payrollBankAccount.value.trim().slice(0, 10),
     paymentMethod,
     status: 'paid',
@@ -7306,7 +7653,7 @@ async function markSelectedPayrollPaid() {
 markPayrollPaid.addEventListener('click', markSelectedPayrollPaid);
 
 async function reopenSelectedPayroll() {
-  if (currentRole !== 'admin' || !selectedHistoryUserId || !selectedWeekKey) return;
+  if (!hasPermission('payroll-edit') || !selectedHistoryUserId || !selectedWeekKey) return;
   const record = currentPayrollRecord();
   if (!record || record.status !== 'paid') return;
   if (!window.confirm('¿Reabrir este pago? Podrás corregir datos y volver a marcarlo como pagado.')) return;
@@ -7343,7 +7690,7 @@ function loadPayrollRecord() {
     unsubscribePayroll = null;
   }
 
-  if (currentRole !== 'admin' || !selectedHistoryUserId || !selectedWeekKey) return;
+  if (!hasPermission('payroll-view') || !selectedHistoryUserId || !selectedWeekKey) return;
 
   const key = payrollRecordKey(selectedHistoryUserId, selectedWeekKey);
   const ref = doc(db, 'payroll', key);
@@ -7398,7 +7745,7 @@ function renderWeekTabs(sales) {
     btn.addEventListener('click', () => {
       selectedWeekKey = key;
       refreshHistoryView();
-      if (currentRole === 'admin') loadPayrollRecord();
+      if (hasPermission('payroll-view')) loadPayrollRecord();
     });
 
     historyWeekTabs.appendChild(btn);
@@ -7420,7 +7767,7 @@ function refreshHistoryView() {
   const soldTotal = weekSales.reduce((sum, sale) => sum + (Number(sale.total) || 0), 0);
   const costTotalValue = weekSales.reduce((sum, sale) => sum + (Number(sale.costTotal) || 0), 0);
   const profitTotal = weekSales.reduce((sum, sale) => sum + (Number(sale.profit) || 0), 0);
-  const isMechanicView = currentRole !== 'admin';
+  const isMechanicView = historyContext === 'self';
 
   historyWeekLabel.textContent = selectedWeekKey === currentWeekKey()
     ? `Semana actual · domingo 00:00 a sábado 23:59 · ${formatWeekRange(selectedWeekKey)}`
@@ -7434,7 +7781,7 @@ function refreshHistoryView() {
   historyCost.textContent = formatMoney(costTotalValue);
   historyProfit.textContent = formatMoney(profitTotal);
 
-  if (currentRole === 'admin') {
+  if (hasPermission('payroll-view')) {
     renderPayrollPanel();
   }
 
@@ -7470,7 +7817,7 @@ function refreshHistoryView() {
     meta.textContent = [
       sale.date || '',
       sale.time || '',
-      currentRole === 'admin' ? (sale.userName || sale.userEmail || '') : '',
+      historyContext === 'team' ? (sale.userName || sale.userEmail || '') : '',
     ].filter(Boolean).join(' · ');
 
     const totalWrap = document.createElement('div');
@@ -7610,13 +7957,22 @@ recordsSearch.addEventListener('input', refreshAdminRecordsView);
 showVoidedRecords.addEventListener('change', refreshAdminRecordsView);
 
 
+function canAssignPosition(positionId) {
+  const id = normalizePositionId(positionId);
+  if (currentRole === 'admin' || permissionPositionId() === 'management') return true;
+  if (permissionPositionId() === 'mechanic-chief') {
+    return ['workshop-boss', 'senior-mechanic', 'trial-mechanic'].includes(id);
+  }
+  return false;
+}
+
 function fillNewMechanicPositionOptions() {
   if (!newMechanicPosition) return;
-  const wanted = newMechanicPosition.value || 'mechanic';
+  const wanted = normalizePositionId(newMechanicPosition.value) || 'senior-mechanic';
   newMechanicPosition.innerHTML = '';
 
   positionCatalog
-    .filter(item => item.active !== false)
+    .filter(item => item.active !== false && canAssignPosition(item.id))
     .forEach(item => {
       const option = document.createElement('option');
       option.value = item.id;
@@ -7626,8 +7982,8 @@ function fillNewMechanicPositionOptions() {
 
   if ([...newMechanicPosition.options].some(option => option.value === wanted)) {
     newMechanicPosition.value = wanted;
-  } else if ([...newMechanicPosition.options].some(option => option.value === 'mechanic')) {
-    newMechanicPosition.value = 'mechanic';
+  } else if ([...newMechanicPosition.options].some(option => option.value === 'senior-mechanic')) {
+    newMechanicPosition.value = 'senior-mechanic';
   }
 }
 
@@ -7637,8 +7993,8 @@ function resetMechanicCreateForm() {
   newMechanicPassword.value = '';
   newMechanicBankAccount.value = '';
   fillNewMechanicPositionOptions();
-  if ([...newMechanicPosition.options].some(option => option.value === 'mechanic')) {
-    newMechanicPosition.value = 'mechanic';
+  if ([...newMechanicPosition.options].some(option => option.value === 'senior-mechanic')) {
+    newMechanicPosition.value = 'senior-mechanic';
   }
   setStatus(mechanicCreateStatus, '');
 }
@@ -7651,7 +8007,7 @@ function setMechanicCreateOpen(open) {
   }
 }
 
-newMechanicBtn.addEventListener('click', () => setMechanicCreateOpen(true));
+newMechanicBtn.addEventListener('click', () => { if (hasPermission('team-manage')) setMechanicCreateOpen(true); });
 mechanicCreateClose.addEventListener('click', () => setMechanicCreateOpen(false));
 cancelMechanicCreate.addEventListener('click', () => setMechanicCreateOpen(false));
 showInactiveMechanics.addEventListener('change', renderMechanicDirectory);
@@ -7668,12 +8024,12 @@ function friendlyCreateMechanicError(error) {
 }
 
 saveMechanicBtn.addEventListener('click', async () => {
-  if (currentRole !== 'admin' || !auth.currentUser) return;
+  if (!hasPermission('team-manage') || !auth.currentUser) return;
 
   const name = newMechanicName.value.trim();
   const email = newMechanicEmail.value.trim().toLowerCase();
   const password = newMechanicPassword.value;
-  const positionId = newMechanicPosition.value || 'mechanic';
+  const positionId = newMechanicPosition.value || 'senior-mechanic';
   const bankAccount = newMechanicBankAccount.value.trim().slice(0, 10);
 
   if (!name) {
@@ -7733,11 +8089,11 @@ saveMechanicBtn.addEventListener('click', async () => {
   }
 });
 
-function fillEditMechanicPositionOptions(selectedId = 'mechanic') {
+function fillEditMechanicPositionOptions(selectedId = 'senior-mechanic') {
   if (!editMechanicPosition) return;
   editMechanicPosition.innerHTML = '';
   positionCatalog
-    .filter(item => item.active !== false || item.id === selectedId)
+    .filter(item => (item.active !== false || item.id === selectedId) && canAssignPosition(item.id))
     .forEach(item => {
       const option = document.createElement('option');
       option.value = item.id;
@@ -7750,12 +8106,16 @@ function fillEditMechanicPositionOptions(selectedId = 'mechanic') {
 }
 
 function openMechanicEdit(profile) {
-  if (!profile?.uid) return;
+  if (!profile?.uid || !hasPermission('team-manage')) return;
+  if (!canAssignPosition(profile.positionId)) {
+    setStatus(mechanicDirectoryStatus, 'No puedes editar un rango igual o superior al tuyo.', 'error');
+    return;
+  }
   selectedMechanicEditUid = profile.uid;
   mechanicEditTitle.textContent = `Editar · ${profile.name || profile.email || 'Mecánico'}`;
   editMechanicName.value = profile.name || '';
   editMechanicEmail.value = profile.email || '';
-  fillEditMechanicPositionOptions(profile.positionId || 'mechanic');
+  fillEditMechanicPositionOptions(normalizePositionId(profile.positionId) || 'senior-mechanic');
   editMechanicBankAccount.value = String(profile.bankAccount || '').slice(0, 10);
   setStatus(mechanicEditStatus, '');
   mechanicEditEditor.hidden = false;
@@ -7772,10 +8132,10 @@ mechanicEditClose.addEventListener('click', closeMechanicEdit);
 cancelMechanicEdit.addEventListener('click', closeMechanicEdit);
 
 saveMechanicEdit.addEventListener('click', async () => {
-  if (currentRole !== 'admin' || !selectedMechanicEditUid) return;
+  if (!hasPermission('team-manage') || !selectedMechanicEditUid) return;
 
   const name = editMechanicName.value.trim();
-  const positionId = editMechanicPosition.value || 'mechanic';
+  const positionId = editMechanicPosition.value || 'senior-mechanic';
   const bankAccount = editMechanicBankAccount.value.trim().slice(0, 10);
 
   if (!name) {
@@ -7818,7 +8178,11 @@ saveMechanicEdit.addEventListener('click', async () => {
 });
 
 async function setMechanicActive(profile, active) {
-  if (currentRole !== 'admin' || !profile?.uid) return;
+  if (!hasPermission('team-manage') || !profile?.uid) return;
+  if (!canAssignPosition(profile.positionId)) {
+    setStatus(mechanicDirectoryStatus, 'No puedes cambiar el estado de un rango igual o superior al tuyo.', 'error');
+    return;
+  }
   const verb = active ? 'reactivar' : 'dar de baja';
   const confirmed = window.confirm(`¿Quieres ${verb} a ${profile.name || profile.email || 'este mecánico'}?`);
   if (!confirmed) return;
@@ -7841,7 +8205,7 @@ async function setMechanicActive(profile, active) {
 }
 
 function renderMechanicDirectory() {
-  if (currentRole !== 'admin') return;
+  if (!hasPermission('team-view')) return;
 
   const search = mechanicSearch.value.trim().toLowerCase();
   const currentKey = currentWeekKey();
@@ -7869,7 +8233,9 @@ function renderMechanicDirectory() {
       ? 'No encontré personas con esa búsqueda.'
       : includeInactive
         ? 'Todavía no hay mecánicos registrados.'
-        : 'Todavía no hay mecánicos activos. Puedes agregar uno arriba.';
+        : hasPermission('team-manage')
+          ? 'Todavía no hay mecánicos activos. Puedes agregar uno arriba.'
+          : 'Todavía no hay mecánicos activos.';
     mechanicDirectory.appendChild(empty);
     return;
   }
@@ -7943,9 +8309,10 @@ function renderMechanicDirectory() {
       event.stopPropagation();
       setMechanicActive(profile, !active);
     });
-    actions.append(editBtn, statusBtn);
+    if (hasPermission('team-manage') && canAssignPosition(profile.positionId)) actions.append(editBtn, statusBtn);
 
     const openProfile = () => {
+      historyContext = 'team';
       selectedHistoryUserId = profile.uid;
       selectedHistoryUserName = profile.name || profile.email || 'Mecánico';
       selectedMechanicProfile = profile;
@@ -8002,20 +8369,29 @@ function applyCurrentUserProfile(user, profile) {
   mechanicUser.textContent = `Sesión: ${displayName}`;
   adminHomeUser.textContent = `Sesión: ${displayName}`;
 
-  historyTitle.textContent = currentRole === 'admin' ? 'Historial de ventas' : 'Mis ventas';
-  historySubtitle.textContent = currentRole === 'admin'
-    ? 'Ventas registradas por todo el equipo'
-    : 'Tus ventas registradas';
+  historyTitle.textContent = 'Mis ventas';
+  historySubtitle.textContent = 'Tus ventas registradas';
 
-  adminMenuOnlyItems.forEach(item => item.hidden = currentRole !== 'admin');
-  mechanicMenuOnlyItems.forEach(item => item.hidden = currentRole === 'admin');
+  adminMenuOnlyItems.forEach(item => {
+    const permission = item.dataset.permission || '';
+    item.hidden = permission
+      ? !hasPermission(permission)
+      : !(hasPermission('prices-view') || hasPermission('agreements-view'));
+  });
+  mechanicMenuOnlyItems.forEach(item => item.hidden = false);
   accountMenuButton.hidden = false;
   document.body.classList.toggle('view-admin', currentRole === 'admin');
+  document.body.classList.toggle('view-payroll', hasPermission('payroll-view'));
+  document.body.classList.toggle('view-void-actions', canDirectVoidSales() || canUseVoidCode());
   window.stopCarAdminAPI.setCatalogRole(currentRole);
 
-  if (currentRole === 'admin') {
+  newMechanicBtn.hidden = !hasPermission('team-manage');
+  newAgreementBtn.hidden = !hasPermission('agreements-add');
+  teamPositionsBtn.hidden = true;
+
+  if (hasPermission('prices-view')) {
     buildEditor(latestConfig);
-    setStatus(saveStatus, '');
+    if (hasPermission('prices-edit')) setStatus(saveStatus, '');
   }
 
   return true;
@@ -8043,8 +8419,9 @@ function subscribeToCurrentUserProfile(user) {
 
       // Si un admin cambia nombre, puesto o estado, la sesión lo refleja sin recargar.
       if (!overlay.classList.contains('is-open')) return;
-      if (!historyPanel.hidden && currentRole !== 'admin') refreshHistoryView();
+      if (!historyPanel.hidden) refreshHistoryView();
       if (!accountSessionPanel.hidden) showAccountSession();
+      if (!adminRecordsPanel.hidden) refreshVoidCodePanel();
     },
     error => {
       console.error(error);
@@ -8059,7 +8436,7 @@ function subscribeToUsers() {
     unsubscribeUsers = null;
   }
 
-  if (currentRole !== 'admin') {
+  if (!hasPermission('team-view')) {
     mechanicProfiles = [];
     return;
   }
@@ -8108,7 +8485,7 @@ function subscribeToSales(user) {
 
   setStatus(historyStatus, 'Cargando ventas…');
   const salesCollection = collection(db, 'sales');
-  const salesQuery = currentRole === 'admin'
+  const salesQuery = canReadAllSales()
     ? salesCollection
     : query(salesCollection, where('userId', '==', user.uid));
 
@@ -8136,6 +8513,7 @@ function subscribeToSales(user) {
 }
 
 saveBtn.addEventListener('click', async () => {
+  if (!hasPermission('prices-edit')) return;
   saveBtn.disabled = true;
   setStatus(saveStatus, 'Guardando…');
   try {
@@ -8203,7 +8581,7 @@ onAuthStateChanged(auth, async user => {
     emailInput.value = '';
     passwordInput.value = '';
     setStatus(loginStatus, '');
-    document.body.classList.remove('view-admin');
+    document.body.classList.remove('view-admin', 'view-payroll', 'view-void-actions');
     window.stopCarAdminAPI.setCatalogRole('mechanic');
 
     subscribeToSales(null);
@@ -8236,7 +8614,7 @@ onAuthStateChanged(auth, async user => {
 
   if (!applyCurrentUserProfile(user, profile)) return;
 
-  if (currentRole === 'admin') {
+  if (hasPermission('positions-edit')) {
     await bootstrapFirebaseConfigIfAdmin();
   }
 
