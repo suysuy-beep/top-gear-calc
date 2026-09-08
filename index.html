@@ -5870,7 +5870,9 @@ function positionLabelFromProfile(profile) {
 
 const POSITION_PERMISSIONS = {
   management: new Set(['records','team-view','team-manage','prices-view','prices-edit','agreements-view','agreements-add','agreements-edit','payroll-view','payroll-edit','positions-edit','void-direct','void-code-generate']),
-  'mechanic-chief': new Set(['records','team-view','team-manage','prices-view','agreements-view','agreements-add','payroll-view','void-direct','void-code-generate']),
+  // Jefe de mecánicos tiene acceso funcional completo, igual que Administrador.
+  // La diferencia es únicamente el nombre/puesto que se muestra en la interfaz.
+  'mechanic-chief': new Set(['records','team-view','team-manage','prices-view','prices-edit','agreements-view','agreements-add','agreements-edit','payroll-view','payroll-edit','positions-edit','void-direct','void-code-generate','void-code-use']),
   'workshop-boss': new Set(['records','team-view','void-code-use']),
   'senior-mechanic': new Set([]),
   'trial-mechanic': new Set([]),
@@ -6797,8 +6799,9 @@ function showAccountSession() {
       || 'Usuario Top Gear';
 
     adminCard?.classList.add('is-account-session');
-    const isAdminSession = currentRole === 'admin';
-    const roleLabel = isAdminSession
+    const isAdminRole = currentRole === 'admin';
+    const isFullAdminSession = isAdminRole || permissionPositionId() === 'mechanic-chief';
+    const roleLabel = isAdminRole
       ? 'Administrador'
       : (positionLabelFromProfile(currentProfile) || 'Mecánico');
     const firstName = String(name).trim().split(/\s+/)[0] || name;
@@ -6806,17 +6809,17 @@ function showAccountSession() {
     accountSessionName.textContent = `Bienvenido, ${firstName}`;
     accountSessionRole.textContent = roleLabel;
     if (accountSessionRoleIcon) {
-      accountSessionRoleIcon.innerHTML = accountRoleIconSvg(isAdminSession ? 'admin' : 'mechanic');
+      accountSessionRoleIcon.innerHTML = accountRoleIconSvg(isFullAdminSession ? 'admin' : 'mechanic');
     }
-    accountSessionMessage.textContent = isAdminSession
+    accountSessionMessage.textContent = isFullAdminSession
       ? 'Tu sesión está activa. Todo listo para seguir gestionando el taller.'
       : 'Tu sesión está activa. Todo listo para registrar ventas y seguir trabajando en el taller.';
     accountSessionInfoName.textContent = name;
     accountSessionInfoRole.textContent = roleLabel;
-    accountSessionAccessTitle.textContent = isAdminSession
+    accountSessionAccessTitle.textContent = isFullAdminSession
       ? 'Acceso total al sistema'
       : 'Acceso de personal';
-    accountSessionAccessText.textContent = isAdminSession
+    accountSessionAccessText.textContent = isFullAdminSession
       ? 'Gestiona precios, convenios, equipo, registros y nómina.'
       : 'Registra ventas, consulta tu historial y revisa tu semana actual.';
     setAdminHeader('Mi cuenta', `${name} · ${roleLabel}`);
@@ -7964,10 +7967,8 @@ showVoidedRecords.addEventListener('change', refreshAdminRecordsView);
 
 function canAssignPosition(positionId) {
   const id = normalizePositionId(positionId);
-  if (currentRole === 'admin' || permissionPositionId() === 'management') return true;
-  if (permissionPositionId() === 'mechanic-chief') {
-    return ['workshop-boss', 'senior-mechanic', 'trial-mechanic'].includes(id);
-  }
+  // Administrador y Jefe de mecánicos pueden asignar cualquier puesto.
+  if (currentRole === 'admin' || permissionPositionId() === 'mechanic-chief' || permissionPositionId() === 'management') return true;
   return false;
 }
 
@@ -8386,11 +8387,11 @@ function applyCurrentUserProfile(user, profile) {
   });
   mechanicMenuOnlyItems.forEach(item => item.hidden = false);
   accountMenuButton.hidden = false;
-  document.body.classList.toggle('view-admin', currentRole === 'admin');
+  document.body.classList.toggle('view-admin', currentRole === 'admin' || permissionPositionId() === 'mechanic-chief');
   document.body.classList.toggle('view-record-financials', hasPermission('records'));
   document.body.classList.toggle('view-payroll', hasPermission('payroll-view'));
   document.body.classList.toggle('view-void-actions', canDirectVoidSales() || canUseVoidCode());
-  window.stopCarAdminAPI.setCatalogRole(currentRole);
+  window.stopCarAdminAPI.setCatalogRole(currentRole === 'admin' || permissionPositionId() === 'mechanic-chief' ? 'admin' : currentRole);
 
   newMechanicBtn.hidden = !hasPermission('team-manage');
   newAgreementBtn.hidden = !hasPermission('agreements-add');
