@@ -1657,23 +1657,89 @@ body.view-admin #costTotal { color: #c6ced3; }
 .mechanic-create-editor {
   margin-top: 2px;
 }
+
+/* Alta/edición de personal: usa todo el ancho del panel.
+   El editor de convenios tiene una columna reservada para logos; aquí no la necesitamos. */
+.mechanic-create-editor .agreement-editor-body,
+.mechanic-edit-editor .agreement-editor-body {
+  display: block;
+  padding: 16px;
+}
+
 .mechanic-create-grid {
   display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 10px;
   width: 100%;
+  gap: 12px;
 }
+
+/* Alta: nombre compacto + correo amplio; segunda fila en tres columnas. */
+.mechanic-create-editor .mechanic-create-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(1) { grid-column: span 4; }
+.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(2) { grid-column: span 8; }
+.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(3),
+.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(4),
+.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(5) { grid-column: span 4; }
+
+/* Edición: dos columnas limpias. */
+.mechanic-edit-editor .mechanic-create-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mechanic-create-editor .payroll-field,
+.mechanic-edit-editor .payroll-field {
+  min-width: 0;
+}
+.mechanic-create-editor .payroll-field > span,
+.mechanic-edit-editor .payroll-field > span {
+  min-height: 12px;
+  font-size: 8px;
+  letter-spacing: .5px;
+}
+.mechanic-create-editor .payroll-field input,
+.mechanic-create-editor .payroll-field select,
+.mechanic-edit-editor .payroll-field input,
+.mechanic-edit-editor .payroll-field select {
+  min-height: 43px;
+  padding: 9px 11px;
+  font-size: 10px;
+}
+
 .mechanic-create-note {
   grid-column: 1 / -1;
-  padding: 9px 10px;
+  padding: 10px 12px;
   border: 1px solid #2e393f;
+  border-left-color: rgba(63,211,90,.48);
   border-radius: 7px;
-  background: #0a0f12;
+  background: linear-gradient(90deg, rgba(63,211,90,.035), transparent 55%), #0a0f12;
   color: #7f8d93;
   font-size: 8px;
   line-height: 1.45;
 }
 .mechanic-create-note strong { color: #b9c7be; }
+
+.mechanic-create-editor .agreement-editor-actions,
+.mechanic-edit-editor .agreement-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+}
+.mechanic-create-editor .agreement-editor-actions > span,
+.mechanic-edit-editor .agreement-editor-actions > span {
+  display: none;
+}
+.mechanic-create-editor .agreement-editor-actions button,
+.mechanic-edit-editor .agreement-editor-actions button {
+  min-width: 112px;
+}
+.mechanic-create-editor > .admin-status,
+.mechanic-edit-editor > .admin-status {
+  padding: 0 16px 12px;
+}
+
 #newMechanicPassword {
   letter-spacing: .7px;
 }
@@ -1683,6 +1749,43 @@ body.view-admin #costTotal { color: #c6ced3; }
   color: #718087;
   font-size: 8px;
   line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+  .mechanic-create-editor .mechanic-create-grid,
+  .mechanic-edit-editor .mechanic-create-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(n) {
+    grid-column: auto;
+  }
+  .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(2),
+  .mechanic-create-editor .mechanic-create-note,
+  .mechanic-edit-editor .mechanic-edit-email-note {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .mechanic-create-editor .mechanic-create-grid,
+  .mechanic-edit-editor .mechanic-create-grid {
+    grid-template-columns: 1fr;
+  }
+  .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(n),
+  .mechanic-create-editor .mechanic-create-note,
+  .mechanic-edit-editor .mechanic-edit-email-note {
+    grid-column: auto;
+  }
+  .mechanic-create-editor .agreement-editor-actions,
+  .mechanic-edit-editor .agreement-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .mechanic-create-editor .agreement-editor-actions button,
+  .mechanic-edit-editor .agreement-editor-actions button {
+    min-width: 0;
+    width: 100%;
+  }
 }
 .records-filter-row {
   display: flex;
