@@ -1657,89 +1657,23 @@ body.view-admin #costTotal { color: #c6ced3; }
 .mechanic-create-editor {
   margin-top: 2px;
 }
-
-/* Alta/edición de personal: usa todo el ancho del panel.
-   El editor de convenios tiene una columna reservada para logos; aquí no la necesitamos. */
-.mechanic-create-editor .agreement-editor-body,
-.mechanic-edit-editor .agreement-editor-body {
-  display: block;
-  padding: 16px;
-}
-
 .mechanic-create-grid {
   display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 10px;
   width: 100%;
-  gap: 12px;
 }
-
-/* Alta: nombre compacto + correo amplio; segunda fila en tres columnas. */
-.mechanic-create-editor .mechanic-create-grid {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-}
-.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(1) { grid-column: span 4; }
-.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(2) { grid-column: span 8; }
-.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(3),
-.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(4),
-.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(5) { grid-column: span 4; }
-
-/* Edición: dos columnas limpias. */
-.mechanic-edit-editor .mechanic-create-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.mechanic-create-editor .payroll-field,
-.mechanic-edit-editor .payroll-field {
-  min-width: 0;
-}
-.mechanic-create-editor .payroll-field > span,
-.mechanic-edit-editor .payroll-field > span {
-  min-height: 12px;
-  font-size: 8px;
-  letter-spacing: .5px;
-}
-.mechanic-create-editor .payroll-field input,
-.mechanic-create-editor .payroll-field select,
-.mechanic-edit-editor .payroll-field input,
-.mechanic-edit-editor .payroll-field select {
-  min-height: 43px;
-  padding: 9px 11px;
-  font-size: 10px;
-}
-
 .mechanic-create-note {
   grid-column: 1 / -1;
-  padding: 10px 12px;
+  padding: 9px 10px;
   border: 1px solid #2e393f;
-  border-left-color: rgba(63,211,90,.48);
   border-radius: 7px;
-  background: linear-gradient(90deg, rgba(63,211,90,.035), transparent 55%), #0a0f12;
+  background: #0a0f12;
   color: #7f8d93;
   font-size: 8px;
   line-height: 1.45;
 }
 .mechanic-create-note strong { color: #b9c7be; }
-
-.mechanic-create-editor .agreement-editor-actions,
-.mechanic-edit-editor .agreement-editor-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-}
-.mechanic-create-editor .agreement-editor-actions > span,
-.mechanic-edit-editor .agreement-editor-actions > span {
-  display: none;
-}
-.mechanic-create-editor .agreement-editor-actions button,
-.mechanic-edit-editor .agreement-editor-actions button {
-  min-width: 112px;
-}
-.mechanic-create-editor > .admin-status,
-.mechanic-edit-editor > .admin-status {
-  padding: 0 16px 12px;
-}
-
 #newMechanicPassword {
   letter-spacing: .7px;
 }
@@ -1749,43 +1683,6 @@ body.view-admin #costTotal { color: #c6ced3; }
   color: #718087;
   font-size: 8px;
   line-height: 1.4;
-}
-
-@media (max-width: 760px) {
-  .mechanic-create-editor .mechanic-create-grid,
-  .mechanic-edit-editor .mechanic-create-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(n) {
-    grid-column: auto;
-  }
-  .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(2),
-  .mechanic-create-editor .mechanic-create-note,
-  .mechanic-edit-editor .mechanic-edit-email-note {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 520px) {
-  .mechanic-create-editor .mechanic-create-grid,
-  .mechanic-edit-editor .mechanic-create-grid {
-    grid-template-columns: 1fr;
-  }
-  .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(n),
-  .mechanic-create-editor .mechanic-create-note,
-  .mechanic-edit-editor .mechanic-edit-email-note {
-    grid-column: auto;
-  }
-  .mechanic-create-editor .agreement-editor-actions,
-  .mechanic-edit-editor .agreement-editor-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-  .mechanic-create-editor .agreement-editor-actions button,
-  .mechanic-edit-editor .agreement-editor-actions button {
-    min-width: 0;
-    width: 100%;
-  }
 }
 .records-filter-row {
   display: flex;
@@ -3211,43 +3108,232 @@ body.view-admin .admin-detail-only { display: block !important; }
   display: none !important;
 }
 
-/* Cuenta = solo sesión + cerrar sesión */
+/* Cuenta = panel principal de sesión */
 .account-session-panel {
-  width: min(430px,100%);
-  margin: 18px auto 8px;
+  width: 100%;
+  margin: 6px 0 0;
 }
-.account-session-box {
-  display: flex;
+.account-session-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) 1px minmax(280px, .92fr);
+  gap: 28px;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px;
-  border: 1px solid #2c373d;
-  border-radius: 9px;
-  background: #090e11;
+  padding: 26px 24px 18px;
+  border: 1px solid rgba(54, 208, 111, .34);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 0% 100%, rgba(54,208,111,.12), transparent 28%),
+    linear-gradient(135deg, rgba(22,38,29,.42), rgba(8,12,16,.92) 38%, rgba(8,12,16,.98) 100%);
+  box-shadow: 0 0 0 1px rgba(53, 213, 109, .05) inset, 0 0 28px rgba(53, 213, 109, .08);
+  overflow: hidden;
 }
-.account-session-box small,
-.account-session-box strong,
-.account-session-box span {
-  display: block;
+.account-session-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(53, 213, 109, .05), transparent 22%, transparent 78%, rgba(53, 213, 109, .05));
 }
-.account-session-box small {
-  color: #77858c;
-  font-size: 8px;
+.account-session-hero::after {
+  content: '';
+  position: absolute;
+  left: -24px;
+  bottom: -40px;
+  width: 220px;
+  height: 130px;
+  opacity: .12;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12px 12px, transparent 0 8px, rgba(79, 255, 140, .18) 8px 10px, transparent 10px 22px) 0 0 / 38px 38px,
+    linear-gradient(145deg, rgba(79,255,140,.34), rgba(79,255,140,0));
+  transform: rotate(-16deg);
+  filter: blur(.1px);
+}
+.account-session-main,
+.account-session-side {
+  position: relative;
+  z-index: 1;
+}
+.account-session-main {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+.account-session-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid rgba(79, 255, 140, .65);
+  display: grid;
+  place-items: center;
+  color: #54ff9c;
+  font-size: 38px;
+  box-shadow: 0 0 0 8px rgba(79, 255, 140, .06), 0 0 26px rgba(79, 255, 140, .14);
+  background: radial-gradient(circle at 30% 30%, rgba(79,255,140,.12), rgba(6,10,13,.92));
+}
+.account-session-kicker,
+.account-session-side-title,
+.account-session-foot {
+  font-size: 11px;
   font-weight: 900;
-  letter-spacing: .7px;
+  letter-spacing: .28em;
   text-transform: uppercase;
 }
-.account-session-box strong {
-  margin-top: 3px;
-  color: #eef3ef;
-  font-size: 13px;
+.account-session-kicker {
+  color: #36d06f;
+  display: inline-block;
+  margin-bottom: 8px;
 }
-.account-session-box span {
-  margin-top: 2px;
-  color: #72df84;
-  font-size: 9px;
+.account-session-title {
+  margin: 0;
+  color: #f5f8fb;
+  font-size: 24px;
+  line-height: 1.1;
+}
+.account-session-roleline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: #5df090;
   font-weight: 850;
+  font-size: 14px;
+}
+.account-session-roleicon {
+  font-size: 15px;
+  line-height: 1;
+}
+.account-session-copy {
+  margin: 14px 0 0;
+  max-width: 400px;
+  color: #aeb8bf;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.account-session-divider {
+  width: 1px;
+  height: 100%;
+  min-height: 220px;
+  background: linear-gradient(180deg, transparent, rgba(120, 139, 151, .34), transparent);
+  position: relative;
+  z-index: 1;
+}
+.account-session-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+}
+.account-session-side-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #94a0a7;
+  margin-bottom: 4px;
+}
+.account-session-side-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(95, 122, 111, .46), rgba(95, 122, 111, 0));
+}
+.account-session-meta {
+  display: grid;
+  gap: 14px;
+}
+.account-session-meta-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.account-session-meta-icon {
+  color: #57ec8d;
+  font-size: 18px;
+  line-height: 1.1;
+}
+.account-session-meta-value {
+  color: #f4f7fa;
+  font-size: 15px;
+  font-weight: 800;
+}
+.account-session-meta-label {
+  margin-top: 3px;
+  color: #95a1a8;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.account-session-side .admin-secondary {
+  min-height: 52px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 850;
+  justify-content: center;
+  border-color: rgba(56, 220, 116, .58);
+  box-shadow: 0 0 0 1px rgba(56,220,116,.12) inset, 0 0 24px rgba(56,220,116,.06);
+}
+.account-session-side .admin-secondary:hover {
+  transform: translateY(-1px);
+}
+.account-session-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 22px;
+  color: #707c83;
+  letter-spacing: .32em;
+  font-size: 10px;
+}
+.account-session-foot::before,
+.account-session-foot::after {
+  content: '';
+  width: 92px;
+  max-width: 20vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(111, 123, 129, .35), transparent);
+}
+@media (max-width: 860px) {
+  .account-session-hero {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 22px 18px 18px;
+  }
+  .account-session-divider {
+    display: none;
+  }
+  .account-session-main {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 16px;
+  }
+  .account-session-avatar {
+    width: 76px;
+    height: 76px;
+    font-size: 32px;
+  }
+  .account-session-title {
+    font-size: 22px;
+  }
+}
+@media (max-width: 560px) {
+  .account-session-main {
+    grid-template-columns: 1fr;
+  }
+  .account-session-avatar {
+    margin: 0 auto;
+  }
+  .account-session-main-copy,
+  .account-session-side {
+    text-align: left;
+  }
+  .account-session-foot {
+    letter-spacing: .2em;
+    gap: 10px;
+  }
 }
 
 /* El login siempre queda centrado dentro del modal */
@@ -3591,13 +3677,44 @@ body.view-admin .admin-detail-only { display: block !important; }
         </form>
 
         <div id="accountSessionPanel" class="account-session-panel" hidden>
-          <div class="account-session-box">
-            <div>
-              <small>Sesión activa</small>
-              <strong id="accountSessionName">—</strong>
-              <span id="accountSessionRole">—</span>
+          <div class="account-session-hero">
+            <div class="account-session-main">
+              <div class="account-session-avatar" aria-hidden="true">◉</div>
+              <div class="account-session-main-copy">
+                <span class="account-session-kicker">Sesión activa</span>
+                <h3 id="accountSessionName" class="account-session-title">Bienvenido, —</h3>
+                <div class="account-session-roleline">
+                  <span class="account-session-roleicon" aria-hidden="true">🛠</span>
+                  <span id="accountSessionRole">—</span>
+                </div>
+                <p id="accountSessionMessage" class="account-session-copy">Tu sesión está activa. Lista para seguir dando potencia al taller.</p>
+              </div>
             </div>
-            <button id="accountSessionLogout" class="admin-secondary" type="button">Cerrar sesión</button>
+
+            <div class="account-session-divider" aria-hidden="true"></div>
+
+            <div class="account-session-side">
+              <div class="account-session-side-title">Tu cuenta</div>
+              <div class="account-session-meta">
+                <div class="account-session-meta-row">
+                  <span class="account-session-meta-icon" aria-hidden="true">◌</span>
+                  <div>
+                    <div id="accountSessionInfoName" class="account-session-meta-value">—</div>
+                    <div id="accountSessionInfoRole" class="account-session-meta-label">—</div>
+                  </div>
+                </div>
+                <div class="account-session-meta-row">
+                  <span id="accountSessionAccessIcon" class="account-session-meta-icon" aria-hidden="true">✦</span>
+                  <div>
+                    <div id="accountSessionAccessTitle" class="account-session-meta-value">—</div>
+                    <div id="accountSessionAccessText" class="account-session-meta-label">—</div>
+                  </div>
+                </div>
+              </div>
+              <button id="accountSessionLogout" class="admin-secondary" type="button">Cerrar sesión</button>
+            </div>
+
+            <div class="account-session-foot">Más que un taller, una pasión</div>
           </div>
         </div>
 
@@ -5211,6 +5328,12 @@ const teamPositionsBtn = document.querySelector('#teamPositionsBtn');
 const accountSessionPanel = document.querySelector('#accountSessionPanel');
 const accountSessionName = document.querySelector('#accountSessionName');
 const accountSessionRole = document.querySelector('#accountSessionRole');
+const accountSessionMessage = document.querySelector('#accountSessionMessage');
+const accountSessionInfoName = document.querySelector('#accountSessionInfoName');
+const accountSessionInfoRole = document.querySelector('#accountSessionInfoRole');
+const accountSessionAccessIcon = document.querySelector('#accountSessionAccessIcon');
+const accountSessionAccessTitle = document.querySelector('#accountSessionAccessTitle');
+const accountSessionAccessText = document.querySelector('#accountSessionAccessText');
 const accountSessionLogout = document.querySelector('#accountSessionLogout');
 const adminHomePanel = document.querySelector('#adminHomePanel');
 const adminHomeUser = document.querySelector('#adminHomeUser');
@@ -6283,9 +6406,25 @@ function showAccountSession() {
       || user?.email
       || 'Usuario Top Gear';
 
+    const isAdminSession = currentRole === 'admin';
+    const roleLabel = isAdminSession ? 'Administrador' : 'Mecánico';
     accountSessionName.textContent = `Bienvenido, ${name}`;
-    accountSessionRole.textContent = currentRole === 'admin' ? 'Administrador' : 'Mecánico';
-    setAdminHeader('Bienvenido', name);
+    accountSessionRole.textContent = roleLabel;
+    if (accountSessionMessage) {
+      accountSessionMessage.textContent = isAdminSession
+        ? 'Tu sesión está activa. Listo para seguir dando potencia al taller.'
+        : 'Tu sesión está activa. Todo listo para registrar ventas y seguir trabajando en el taller.';
+    }
+    if (accountSessionInfoName) accountSessionInfoName.textContent = name;
+    if (accountSessionInfoRole) accountSessionInfoRole.textContent = roleLabel;
+    if (accountSessionAccessIcon) accountSessionAccessIcon.textContent = isAdminSession ? '♛' : '🛠';
+    if (accountSessionAccessTitle) accountSessionAccessTitle.textContent = isAdminSession ? 'Acceso total al sistema' : 'Acceso a tus ventas y actividad';
+    if (accountSessionAccessText) {
+      accountSessionAccessText.textContent = isAdminSession
+        ? 'Gestiona precios, convenios, equipo, registros y nómina.'
+        : 'Consulta tu historial, registra ventas y revisa tu semana actual.';
+    }
+    setAdminHeader('Mi cuenta', `${name} · ${roleLabel}`);
   }
 
   setAdminOpen(true);
