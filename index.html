@@ -3276,20 +3276,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   overflow: hidden;
 }
 .account-session-hero::before {
-  content: '';
-  position: absolute;
-  left: -90px;
-  bottom: -85px;
-  width: 420px;
-  height: 230px;
-  opacity: .11;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(28deg, transparent 0 19px, rgba(66,234,128,.38) 19px 28px, transparent 28px 47px),
-    repeating-linear-gradient(152deg, transparent 0 26px, rgba(66,234,128,.20) 26px 34px, transparent 34px 58px);
-  transform: rotate(-8deg);
-  border-radius: 50%;
-  filter: blur(.2px);
+  content: none;
 }
 .account-session-main,
 .account-session-side,
@@ -3354,10 +3341,13 @@ body.view-admin .admin-detail-only { display: block !important; }
 .account-session-roleicon {
   display: inline-grid;
   place-items: center;
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
 }
 .account-session-roleicon svg {
-  width: 19px;
-  height: 19px;
+  width: 12px;
+  height: 12px;
   stroke: currentColor;
 }
 .account-session-copy {
@@ -3877,10 +3867,15 @@ body.view-admin .admin-detail-only { display: block !important; }
                 <span class="account-session-kicker">Sesión activa</span>
                 <h3 id="accountSessionName" class="account-session-title">Bienvenido, —</h3>
                 <div class="account-session-roleline">
-                  <span class="account-session-roleicon" aria-hidden="true">
+                  <span id="accountSessionRoleIcon" class="account-session-roleicon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M14.5 6.5a4 4 0 0 0-5-5L7 4l3 3 2.5-2.5a4 4 0 0 0 2 2z"></path>
-                      <path d="m9.5 7.5-7 7a2.1 2.1 0 0 0 3 3l7-7"></path>
+                      <path d="M4 8.4 8.1 13 12 7.2 15.9 13 20 8.4 18.2 17H5.8L4 8.4Z"></path>
+                      <path d="M8.2 17V20"></path>
+                      <path d="M15.8 17V20"></path>
+                      <path d="M6.6 20h10.8"></path>
+                      <circle cx="12" cy="5" r="1.2"></circle>
+                      <circle cx="4.9" cy="7" r="1"></circle>
+                      <circle cx="19.1" cy="7" r="1"></circle>
                     </svg>
                   </span>
                   <span id="accountSessionRole">—</span>
@@ -5537,6 +5532,7 @@ const teamPositionsBtn = document.querySelector('#teamPositionsBtn');
 const accountSessionPanel = document.querySelector('#accountSessionPanel');
 const accountSessionName = document.querySelector('#accountSessionName');
 const accountSessionRole = document.querySelector('#accountSessionRole');
+const accountSessionRoleIcon = document.querySelector('#accountSessionRoleIcon');
 const accountSessionMessage = document.querySelector('#accountSessionMessage');
 const accountSessionInfoName = document.querySelector('#accountSessionInfoName');
 const accountSessionInfoRole = document.querySelector('#accountSessionInfoRole');
@@ -6602,6 +6598,26 @@ function hideAllAccountPanels() {
   historyPanel.hidden = true;
 }
 
+function accountRoleIconSvg(role) {
+  if (role === 'admin') {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 8.4 8.1 13 12 7.2 15.9 13 20 8.4 18.2 17H5.8L4 8.4Z"></path>
+        <path d="M8.2 17V20"></path>
+        <path d="M15.8 17V20"></path>
+        <path d="M6.6 20h10.8"></path>
+        <circle cx="12" cy="5" r="1.2"></circle>
+        <circle cx="4.9" cy="7" r="1"></circle>
+        <circle cx="19.1" cy="7" r="1"></circle>
+      </svg>`;
+  }
+  return `
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14.5 6.5a4 4 0 0 0-5-5L7 4l3 3 2.5-2.5a4 4 0 0 0 2 2z"></path>
+      <path d="m9.5 7.5-7 7a2.1 2.1 0 0 0 3 3l7-7"></path>
+    </svg>`;
+}
+
 function showAccountSession() {
   hideAllAccountPanels();
 
@@ -6624,6 +6640,9 @@ function showAccountSession() {
 
     accountSessionName.textContent = `Bienvenido, ${firstName}`;
     accountSessionRole.textContent = roleLabel;
+    if (accountSessionRoleIcon) {
+      accountSessionRoleIcon.innerHTML = accountRoleIconSvg(isAdminSession ? 'admin' : 'mechanic');
+    }
     accountSessionMessage.textContent = isAdminSession
       ? 'Tu sesión está activa. Todo listo para seguir gestionando el taller.'
       : 'Tu sesión está activa. Todo listo para registrar ventas y seguir trabajando en el taller.';
@@ -8170,6 +8189,7 @@ onAuthStateChanged(auth, async user => {
   currentProfile = null;
 
   if (!loggedIn) {
+    const overlayWasOpen = overlay.classList.contains('is-open');
     if (unsubscribeCurrentUserProfile) {
       unsubscribeCurrentUserProfile();
       unsubscribeCurrentUserProfile = null;
@@ -8184,6 +8204,9 @@ onAuthStateChanged(auth, async user => {
     userLabel.textContent = '';
     adminHomeUser.textContent = '';
     mechanicUser.textContent = '';
+    emailInput.value = '';
+    passwordInput.value = '';
+    setStatus(loginStatus, '');
     document.body.classList.remove('view-admin');
     window.stopCarAdminAPI.setCatalogRole('mechanic');
 
@@ -8191,6 +8214,11 @@ onAuthStateChanged(auth, async user => {
     subscribeToUsers();
     subscribeToAgreements();
     subscribeToPositions();
+
+    if (overlayWasOpen) {
+      loginForm.hidden = false;
+      setAdminOpen(true);
+    }
     return;
   }
 
