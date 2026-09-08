@@ -3928,7 +3928,6 @@ body.view-admin .admin-detail-only { display: block !important; }
               <div class="admin-editor-note">Tienes acceso al administrador de precios. Los cambios se actualizan para todos.</div>
               <div id="adminUser" class="admin-user"></div>
             </div>
-            <button id="adminLogout" class="admin-secondary" type="button">Cerrar sesión</button>
           </div>
           <div id="adminSections" class="admin-sections"></div>
           <div class="admin-actions">
@@ -5282,7 +5281,6 @@ const quickMenus = {
       ['cosmeticos', 'Cosméticos'],
       ['humo', 'Humo neumáticos'],
       ['extras', 'Extras'],
-      ['mano-reparacion', 'Mano de obra'],
     ],
   },
 };
@@ -5516,7 +5514,6 @@ const loginBtn = document.querySelector('#adminLoginBtn');
 const loginStatus = document.querySelector('#adminLoginStatus');
 const editor = document.querySelector('#adminEditor');
 const userLabel = document.querySelector('#adminUser');
-const logoutBtn = document.querySelector('#adminLogout');
 const sections = document.querySelector('#adminSections');
 const saveBtn = document.querySelector('#adminSave');
 const saveStatus = document.querySelector('#adminSaveStatus');
@@ -5962,7 +5959,6 @@ loginForm.addEventListener('submit', async event => {
 async function closeSession() {
   try { await signOut(auth); } catch (error) { console.error(error); }
 }
-logoutBtn.addEventListener('click', closeSession);
 adminHomeLogout.addEventListener('click', closeSession);
 mechanicLogout.addEventListener('click', closeSession);
 accountSessionLogout.addEventListener('click', closeSession);
