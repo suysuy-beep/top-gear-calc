@@ -1393,65 +1393,6 @@ body.view-admin #costTotal { color: #c6ced3; }
   box-shadow: 0 0 0 2px rgba(63,211,90,.08);
 }
 
-/* ===== DEMO LOCAL ===== */
-.demo-switcher {
-  position: fixed;
-  left: 14px;
-  bottom: 14px;
-  z-index: 190;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px;
-  border: 1px solid rgba(255,255,255,.11);
-  border-radius: 10px;
-  background: rgba(8,12,14,.94);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 12px 32px rgba(0,0,0,.32);
-}
-.demo-label {
-  padding: 0 5px;
-  color: #7d898f;
-  font-size: 8px;
-  font-weight: 950;
-  letter-spacing: .7px;
-  text-transform: uppercase;
-}
-.demo-role-btn,
-.demo-exit-btn {
-  min-height: 30px;
-  padding: 5px 9px;
-  border: 1px solid #303940;
-  border-radius: 6px;
-  background: #0d1316;
-  color: #b9c3c8;
-  font-size: 9px;
-  font-weight: 900;
-  cursor: pointer;
-}
-.demo-role-btn:hover {
-  border-color: rgba(63,211,90,.55);
-  color: #ecfff0;
-}
-.demo-role-btn.is-active {
-  border-color: var(--accent);
-  background: rgba(63,211,90,.13);
-  color: #eaffed;
-}
-.demo-exit-btn {
-  border-color: #4a3538;
-  color: #d3a9ae;
-}
-body.demo-mode .top-login-btn::after {
-  content: "DEMO";
-  margin-left: 3px;
-  padding: 2px 4px;
-  border-radius: 4px;
-  background: rgba(63,211,90,.14);
-  color: #75e989;
-  font-size: 7px;
-  letter-spacing: .55px;
-}
 
 @media (max-width: 900px) {
   body.view-admin .admin-catalog-only { display: none !important; }
@@ -1461,12 +1402,6 @@ body.demo-mode .top-login-btn::after {
   }
 }
 @media (max-width: 640px) {
-  .demo-switcher {
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    justify-content: center;
-  }
   .admin-price-columns,
   .admin-price-row {
     grid-template-columns: minmax(105px,1fr) 88px 88px !important;
@@ -1742,6 +1677,82 @@ body.demo-mode .top-login-btn::after {
 #newMechanicPassword {
   letter-spacing: .7px;
 }
+.mechanic-edit-editor { margin-top: 10px; }
+.mechanic-edit-email-note {
+  grid-column: 1 / -1;
+  color: #718087;
+  font-size: 8px;
+  line-height: 1.4;
+}
+.records-filter-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -2px;
+}
+.records-void-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #839097;
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .45px;
+}
+.records-void-toggle input { accent-color: #3fd35a; }
+.history-item.is-void {
+  opacity: .62;
+  border-color: rgba(219,104,104,.22);
+}
+.history-item.is-void .history-client::after {
+  content: " · ANULADA";
+  color: #e88992;
+  font-size: 8px;
+  letter-spacing: .45px;
+}
+.sale-detail-status {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid #303940;
+  border-radius: 7px;
+  color: #87949a;
+  background: #090e11;
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.sale-detail-status.is-void {
+  border-color: rgba(220,93,106,.35);
+  color: #f0a2aa;
+  background: rgba(150,35,48,.08);
+}
+.sale-detail-admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+body.view-admin .sale-detail-admin-actions.admin-detail-only { display: flex !important; }
+.sale-void-btn {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid #694047;
+  border-radius: 7px;
+  background: rgba(170,49,61,.08);
+  color: #e9a0a8;
+  font-size: 8px;
+  font-weight: 950;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.sale-void-btn:hover { background: rgba(170,49,61,.16); }
+.sale-void-btn.is-restore {
+  border-color: rgba(63,211,90,.42);
+  color: #aee8b8;
+  background: rgba(63,211,90,.06);
+}
+.payroll-reopen-btn { min-height: 38px; white-space: nowrap; }
 @media (max-width: 620px) {
   .mechanic-team-toolbar,
   .mechanic-create-grid {
@@ -2064,7 +2075,7 @@ body.view-admin .admin-detail-only { display: block !important; }
 
 .payroll-pay-row {
   display: grid;
-  grid-template-columns: minmax(150px,1fr) auto auto;
+  grid-template-columns: minmax(150px,1fr) auto auto auto;
   align-items: end;
   gap: 8px;
   margin-top: 11px;
@@ -3407,16 +3418,6 @@ body.view-admin .admin-detail-only { display: block !important; }
     </section>
   </main>
   <div class="suy-watermark" aria-hidden="true"><span class="engraved-word">suysuy</span></div>
-
-  <div class="demo-switcher" aria-label="Vista de prueba">
-    <span class="demo-label">Vista demo</span>
-    <button class="demo-role-btn" type="button" data-demo-role="mechanic">Mecánico</button>
-    <button class="demo-role-btn" type="button" data-demo-role="admin">Admin</button>
-    <button class="demo-exit-btn" type="button" data-demo-role="exit" hidden>Salir</button>
-  </div>
-
-
-
   <template id="categoryTemplate">
     <section class="category-block">
       <div class="category-title"></div>
@@ -3701,6 +3702,12 @@ body.view-admin .admin-detail-only { display: block !important; }
               <span class="history-search-icon">⌕</span>
               <input id="recordsSearch" type="search" placeholder="Buscar cliente, placa, mecánico o servicio…" autocomplete="off" />
             </label>
+            <div class="records-filter-row">
+              <label class="records-void-toggle">
+                <input id="showVoidedRecords" type="checkbox" />
+                <span>Mostrar anuladas</span>
+              </label>
+            </div>
           </div>
 
           <div>
@@ -3817,6 +3824,49 @@ body.view-admin .admin-detail-only { display: block !important; }
             </div>
             <div id="mechanicCreateStatus" class="admin-status" aria-live="polite"></div>
           </section>
+
+          <section id="mechanicEditEditor" class="agreement-editor mechanic-edit-editor" hidden>
+            <div class="agreement-editor-head">
+              <div>
+                <div class="history-week-caption">Datos del personal</div>
+                <strong id="mechanicEditTitle">Editar mecánico</strong>
+              </div>
+              <button id="mechanicEditClose" class="quick-close" type="button">×</button>
+            </div>
+
+            <div class="agreement-editor-body">
+              <div class="mechanic-create-grid">
+                <label class="payroll-field">
+                  <span>Nombre</span>
+                  <input id="editMechanicName" type="text" maxlength="60" autocomplete="off" />
+                </label>
+
+                <label class="payroll-field">
+                  <span>Correo de inicio</span>
+                  <input id="editMechanicEmail" type="email" readonly />
+                </label>
+
+                <label class="payroll-field">
+                  <span>Puesto</span>
+                  <select id="editMechanicPosition"></select>
+                </label>
+
+                <label class="payroll-field">
+                  <span>Cuenta bancaria</span>
+                  <input id="editMechanicBankAccount" type="text" maxlength="10" inputmode="numeric" placeholder="Máx. 10 caracteres" autocomplete="off" />
+                </label>
+
+                <div class="mechanic-edit-email-note">El correo de inicio no se cambia desde aquí para no desincronizar Authentication. Nombre, puesto y cuenta sí se actualizan desde la calculadora.</div>
+              </div>
+            </div>
+
+            <div class="agreement-editor-actions">
+              <span></span><span></span>
+              <button id="cancelMechanicEdit" class="admin-secondary" type="button">Cancelar</button>
+              <button id="saveMechanicEdit" class="admin-primary" type="button">Guardar cambios</button>
+            </div>
+            <div id="mechanicEditStatus" class="admin-status" aria-live="polite"></div>
+          </section>
         </div>
 
         <div id="historyPanel" class="history-panel" hidden>
@@ -3891,6 +3941,7 @@ body.view-admin .admin-detail-only { display: block !important; }
                 </select>
               </label>
               <button id="savePayrollSettings" class="admin-secondary" type="button">Guardar datos</button>
+              <button id="reopenPayroll" class="admin-secondary payroll-reopen-btn" type="button" hidden>Reabrir pago</button>
               <button id="markPayrollPaid" class="admin-primary payroll-paid-btn" type="button">Marcar como pagado</button>
             </div>
 
@@ -3982,6 +4033,11 @@ body.view-admin .admin-detail-only { display: block !important; }
           <div><span>Total cobrado</span><strong id="detailTotal">$0</strong></div>
           <div class="admin-detail-only"><span>Costo</span><strong id="detailCost">$0</strong></div>
           <div class="admin-detail-only"><span>Ganancia</span><strong id="detailProfit">$0</strong></div>
+        </div>
+
+        <div id="detailStatus" class="sale-detail-status">Venta activa</div>
+        <div class="sale-detail-admin-actions admin-detail-only">
+          <button id="toggleSaleVoid" class="sale-void-btn" type="button">Anular venta</button>
         </div>
       </div>
     </section>
@@ -5117,6 +5173,16 @@ const newMechanicEmail = document.querySelector('#newMechanicEmail');
 const newMechanicPassword = document.querySelector('#newMechanicPassword');
 const newMechanicPosition = document.querySelector('#newMechanicPosition');
 const newMechanicBankAccount = document.querySelector('#newMechanicBankAccount');
+const mechanicEditEditor = document.querySelector('#mechanicEditEditor');
+const mechanicEditTitle = document.querySelector('#mechanicEditTitle');
+const mechanicEditClose = document.querySelector('#mechanicEditClose');
+const editMechanicName = document.querySelector('#editMechanicName');
+const editMechanicEmail = document.querySelector('#editMechanicEmail');
+const editMechanicPosition = document.querySelector('#editMechanicPosition');
+const editMechanicBankAccount = document.querySelector('#editMechanicBankAccount');
+const cancelMechanicEdit = document.querySelector('#cancelMechanicEdit');
+const saveMechanicEdit = document.querySelector('#saveMechanicEdit');
+const mechanicEditStatus = document.querySelector('#mechanicEditStatus');
 
 const accountShortcuts = document.querySelector('#accountShortcuts');
 const mechanicMenuOnlyItems = [...document.querySelectorAll('.mechanic-menu-only')];
@@ -5124,6 +5190,7 @@ const historyPanel = document.querySelector('#historyPanel');
 const adminRecordsPanel = document.querySelector('#adminRecordsPanel');
 const recordsBack = document.querySelector('#recordsBack');
 const recordsSearch = document.querySelector('#recordsSearch');
+const showVoidedRecords = document.querySelector('#showVoidedRecords');
 const recordsWeekTabs = document.querySelector('#recordsWeekTabs');
 const recordsWeekLabel = document.querySelector('#recordsWeekLabel');
 const recordsCount = document.querySelector('#recordsCount');
@@ -5155,6 +5222,7 @@ const payrollTotalPreview = document.querySelector('#payrollTotalPreview');
 const payrollPaymentMethod = document.querySelector('#payrollPaymentMethod');
 const savePayrollSettings = document.querySelector('#savePayrollSettings');
 const markPayrollPaid = document.querySelector('#markPayrollPaid');
+const reopenPayroll = document.querySelector('#reopenPayroll');
 const payrollStatus = document.querySelector('#payrollStatus');
 const historyStatus = document.querySelector('#historyStatus');
 const historyList = document.querySelector('#historyList');
@@ -5187,9 +5255,8 @@ const detailDiscount = document.querySelector('#detailDiscount');
 const detailTotal = document.querySelector('#detailTotal');
 const detailCost = document.querySelector('#detailCost');
 const detailProfit = document.querySelector('#detailProfit');
-
-const demoButtons = [...document.querySelectorAll('[data-demo-role]')];
-const demoExit = document.querySelector('.demo-exit-btn');
+const detailStatus = document.querySelector('#detailStatus');
+const toggleSaleVoid = document.querySelector('#toggleSaleVoid');
 
 let latestConfig = window.stopCarAdminAPI.getPriceConfig();
 let unsubscribePrices = null;
@@ -5201,8 +5268,6 @@ let unsubscribeSales = null;
 let unsubscribeUsers = null;
 let unsubscribeCurrentUserProfile = null;
 let unsubscribePayroll = null;
-let demoRole = null;
-let demoSales = [];
 let mechanicProfiles = [];
 let loadedSales = [];
 let selectedHistoryUserId = null;
@@ -5212,6 +5277,8 @@ let selectedRecordsWeekKey = null;
 let lastKnownCurrentWeekKey = null;
 let payrollRecords = {};
 let selectedMechanicProfile = null;
+let selectedMechanicEditUid = null;
+let selectedSaleDetail = null;
 let adminBackView = null;
 let positionCatalog = [];
 let positionEditorState = { editingId: null };
@@ -5329,7 +5396,7 @@ function setAdminOpen(open) {
   overlay.classList.toggle('is-open', open);
   overlay.setAttribute('aria-hidden', String(!open));
   launcher.setAttribute('aria-expanded', String(open));
-  if (open && !auth.currentUser && !demoRole) setTimeout(() => emailInput.focus(), 80);
+  if (open && !auth.currentUser) setTimeout(() => emailInput.focus(), 80);
 }
 
 launcher.addEventListener('click', () => { setAccountMenuOpen(false); showAccountSession(); });
@@ -5463,10 +5530,6 @@ loginForm.addEventListener('submit', async event => {
 });
 
 async function closeSession() {
-  if (demoRole) {
-    location.reload();
-    return;
-  }
   try { await signOut(auth); } catch (error) { console.error(error); }
 }
 logoutBtn.addEventListener('click', closeSession);
@@ -5478,150 +5541,12 @@ accountSessionLogout.addEventListener('click', closeSession);
 
 
 function effectiveUser() {
-  if (auth.currentUser) return auth.currentUser;
-  if (!demoRole) return null;
-  return {
-    uid: `demo-${demoRole}`,
-    email: demoRole === 'admin' ? 'admin.demo@topgear.local' : 'mecanico.demo@topgear.local',
-  };
+  return auth.currentUser;
 }
 
 function hasSession() {
-  return Boolean(effectiveUser());
+  return Boolean(auth.currentUser);
 }
-
-function applyRoleChrome(role, displayName) {
-  currentRole = role;
-  currentProfile = { name: displayName, role };
-
-  document.body.classList.add('session-active');
-  document.body.classList.toggle('view-admin', role === 'admin');
-
-  accountShortcuts.hidden = true;
-  accountMenuButton.hidden = false;
-  adminMenuOnlyItems.forEach(item => item.hidden = role !== 'admin');
-  mechanicMenuOnlyItems.forEach(item => item.hidden = role === 'admin');
-
-  sessionLauncherText.textContent = displayName;
-  userLabel.textContent = `Sesión: ${displayName}`;
-  adminHomeUser.textContent = `Sesión: ${displayName}`;
-  mechanicUser.textContent = `Sesión: ${displayName}`;
-  adminHomeUser.textContent = `Sesión: ${displayName}`;
-  historyTitle.textContent = role === 'admin' ? 'Historial de ventas' : 'Mis ventas';
-  historySubtitle.textContent = role === 'admin'
-    ? 'Ventas registradas por todo el equipo'
-    : 'Tus ventas registradas';
-
-  setAdminHeader('Mi cuenta', role === 'admin' ? 'Administrador' : displayName);
-
-  window.stopCarAdminAPI.setCatalogRole(role);
-
-  if (role === 'admin') {
-    buildEditor(latestConfig);
-    setStatus(saveStatus, '');
-  }
-}
-
-
-function demoIso(daysAgo, hour = 12, minute = 0) {
-  const d = new Date();
-  d.setHours(hour, minute, 0, 0);
-  d.setDate(d.getDate() - daysAgo);
-  return d.toISOString();
-}
-
-function makeDemoSale({ id, uid, name, daysAgo, total, cost, customer, plate, service }) {
-  const d = new Date(demoIso(daysAgo, 12 + (daysAgo % 5), 10 + (daysAgo % 40)));
-  return {
-    id,
-    userId: uid,
-    userName: name,
-    userEmail: `${uid.replace('demo-', '')}@topgear.local`,
-    createdAt: null,
-    createdAtClient: d.toISOString(),
-    date: d.toLocaleDateString('es-MX'),
-    time: d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
-    weekKey: getWeekKey(d),
-    subtotal: total,
-    discountPercent: 0,
-    discountValue: 0,
-    total,
-    costTotal: cost,
-    profit: total - cost,
-    services: [{
-      id: service.toLowerCase().replace(/\s+/g, '-'),
-      name: service,
-      qty: 1,
-      unitPrice: total,
-      unitCost: cost,
-      lineTotal: total,
-      lineCost: cost,
-    }],
-    packages: [],
-    customer,
-    plate,
-    status: 'active',
-  };
-}
-
-function seedDemoData() {
-  if (!mechanicProfiles.length) {
-    mechanicProfiles = [
-      { uid: 'demo-mechanic', name: 'Mecánico Demo', email: 'mecanico.demo@topgear.local', role: 'mechanic', active: true, positionId: 'mechanic', weeklyBaseSalary: 1600, commissionPercent: 8, bankAccount: '1234567890' },
-      { uid: 'demo-rick', name: 'Rick', email: 'rick@topgear.local', role: 'mechanic', active: true, positionId: 'workshop-boss', weeklyBaseSalary: 2200, commissionPercent: 7, bankAccount: '6461801578' },
-      { uid: 'demo-luna', name: 'Luna', email: 'luna@topgear.local', role: 'mechanic', active: true, positionId: 'trial-mechanic', weeklyBaseSalary: 1000, commissionPercent: 5, bankAccount: '0726910088' },
-    ];
-  }
-
-  if (!demoSales.length) {
-    demoSales = [
-      makeDemoSale({ id:'s1', uid:'demo-mechanic', name:'Mecánico Demo', daysAgo:0, total:11000, cost:4000, customer:'ASD', plate:'ABC123', service:'Frenos Cerámicos' }),
-      makeDemoSale({ id:'s2', uid:'demo-mechanic', name:'Mecánico Demo', daysAgo:1, total:550, cost:150, customer:'Valeria', plate:'TOP007', service:'Kit de Limpieza' }),
-      makeDemoSale({ id:'s3', uid:'demo-mechanic', name:'Mecánico Demo', daysAgo:8, total:25500, cost:15000, customer:'Ailea', plate:'ELITE1', service:'TurboCharger' }),
-      makeDemoSale({ id:'s4', uid:'demo-mechanic', name:'Mecánico Demo', daysAgo:15, total:6200, cost:2500, customer:'Nico', plate:'OFF44', service:'Neumáticos Off-Road' }),
-      makeDemoSale({ id:'s5', uid:'demo-rick', name:'Rick', daysAgo:0, total:42500, cost:30000, customer:'Sofi', plate:'RCK888', service:'Motor V8 Upgrade' }),
-      makeDemoSale({ id:'s6', uid:'demo-rick', name:'Rick', daysAgo:9, total:20000, cost:15000, customer:'Dani', plate:'LOW001', service:'Stance o suspensión' }),
-      makeDemoSale({ id:'s7', uid:'demo-luna', name:'Luna', daysAgo:1, total:10500, cost:4000, customer:'Max', plate:'AWD777', service:'Tracción AWD' }),
-      makeDemoSale({ id:'s8', uid:'demo-luna', name:'Luna', daysAgo:16, total:5700, cost:2000, customer:'Alex', plate:'SLK555', service:'Neumáticos Slick' }),
-    ];
-  }
-
-  loadedSales = [...demoSales];
-}
-
-function setDemoRole(role) {
-  if (role === 'exit') {
-    location.reload();
-    return;
-  }
-
-  demoRole = role;
-  seedDemoData();
-  document.body.classList.add('demo-mode');
-  demoButtons.forEach(btn => {
-    btn.classList.toggle('is-active', btn.dataset.demoRole === role);
-  });
-  demoExit.hidden = false;
-
-  finishInitialPriceLoad();
-
-  const displayName = role === 'admin' ? 'Admin Demo' : 'Mecánico Demo';
-  applyRoleChrome(role, displayName);
-  loginForm.hidden = true;
-
-  defaultAccountView();
-  subscribeToSales(effectiveUser());
-  subscribeToUsers();
-  subscribeToAgreements();
-  subscribeToPositions();
-  setAdminOpen(true);
-}
-
-demoButtons.forEach(btn => {
-  btn.addEventListener('click', () => setDemoRole(btn.dataset.demoRole));
-});
-
-
 
 function currentMechanicPositionLabel() {
   const profile = selectedMechanicProfile
@@ -5720,10 +5645,6 @@ async function persistPositionsConfig(nextPositions, statusMessage = 'Puestos ac
   applyPositionsConfig(nextPositions);
   renderPositionsAdminList();
 
-  if (demoRole) {
-    setStatus(positionsAdminStatus, 'Cambios aplicados en la vista DEMO.', 'ok');
-    return;
-  }
 
   await setDoc(positionsRef, {
     positions: nextPositions,
@@ -5781,7 +5702,7 @@ deletePositionBtn.addEventListener('click', async () => {
 
 
 async function bootstrapFirebaseConfigIfAdmin() {
-  if (demoRole || currentRole !== 'admin' || !auth.currentUser) return;
+  if (currentRole !== 'admin' || !auth.currentUser) return;
 
   try {
     const [priceSnap, agreementSnap, positionSnap] = await Promise.all([
@@ -5851,10 +5772,6 @@ function subscribeToPositions() {
     unsubscribePositions = null;
   }
 
-  if (demoRole) {
-    applyPositionsConfig(positionCatalog.length ? positionCatalog : defaultPositionsConfig());
-    return;
-  }
 
   unsubscribePositions = onSnapshot(
     positionsRef,
@@ -6099,10 +6016,6 @@ async function persistAgreementsConfig(config) {
   window.topGearAgreementsAPI.applyConfig(config);
   renderAgreementsAdminList();
 
-  if (demoRole) {
-    setStatus(agreementsAdminStatus, 'Cambios aplicados en esta vista DEMO.', 'ok');
-    return;
-  }
 
   await setDoc(agreementsRef, {
     groups: config,
@@ -6155,9 +6068,7 @@ saveAgreementBtn.addEventListener('click', async () => {
     console.error(error);
     setStatus(
       agreementsAdminStatus,
-      demoRole
-        ? 'No se pudo actualizar el convenio.'
-        : 'No se pudo guardar. Si cambiaste una imagen, la imagen puede ser demasiado pesada o Firestore puede necesitar permisos.',
+      'No se pudo guardar. Si cambiaste una imagen, la imagen puede ser demasiado pesada o Firestore puede necesitar permisos.',
       'error'
     );
   } finally {
@@ -6193,10 +6104,6 @@ function subscribeToAgreements() {
     unsubscribeAgreements = null;
   }
 
-  if (demoRole) {
-    renderAgreementsAdminList();
-    return;
-  }
 
   unsubscribeAgreements = onSnapshot(
     agreementsRef,
@@ -6270,13 +6177,12 @@ function showAccountSession() {
     accountSessionPanel.hidden = false;
     const user = effectiveUser();
     const name = currentProfile?.name
-      || (demoRole === 'admin' ? 'Admin Demo' : demoRole === 'mechanic' ? 'Mecánico Demo' : null)
       || user?.email
       || 'Usuario Top Gear';
 
-    accountSessionName.textContent = name;
+    accountSessionName.textContent = `Bienvenido, ${name}`;
     accountSessionRole.textContent = currentRole === 'admin' ? 'Administrador' : 'Mecánico';
-    setAdminHeader('Mi cuenta', currentRole === 'admin' ? 'Administrador' : 'Mecánico');
+    setAdminHeader('Bienvenido', name);
   }
 
   setAdminOpen(true);
@@ -6298,11 +6204,14 @@ function setAccountView(view) {
     adminRecordsPanel.hidden = false;
     setAdminHeader('Registros', 'Todas las ventas del taller');
     selectedRecordsWeekKey = currentWeekKey();
+    showVoidedRecords.checked = false;
     refreshAdminRecordsView();
 
   } else if (view === 'history') {
     if (currentRole === 'admin') {
       adminMechanicsPanel.hidden = false;
+      setMechanicCreateOpen(false);
+      closeMechanicEdit();
       setAdminHeader('Equipo', 'Personal contratado', null, 'positions');
       selectedHistoryUserId = null;
       selectedHistoryUserName = '';
@@ -6365,6 +6274,7 @@ historyBack.addEventListener('click', () => {
 function openSaleDetail(open) {
   saleDetailOverlay.classList.toggle('is-open', open);
   saleDetailOverlay.setAttribute('aria-hidden', String(!open));
+  if (!open) selectedSaleDetail = null;
 }
 
 saleDetailClose.addEventListener('click', () => openSaleDetail(false));
@@ -6410,6 +6320,7 @@ function fillDetailItems(sale) {
 }
 
 function showSaleDetail(sale) {
+  selectedSaleDetail = sale || null;
   detailCustomer.textContent = sale.customer || 'Sin nombre';
   detailPlate.textContent = sale.plate || sale.vehicle || 'Sin placa';
   detailUser.textContent = sale.userName || sale.userEmail || 'Usuario';
@@ -6427,8 +6338,66 @@ function showSaleDetail(sale) {
   detailCost.textContent = formatMoney(sale.costTotal);
   detailProfit.textContent = formatMoney(sale.profit);
 
+  const isVoid = sale.status === 'void';
+  detailStatus.classList.toggle('is-void', isVoid);
+  detailStatus.textContent = isVoid
+    ? `Venta anulada${sale.voidReason ? ` · ${sale.voidReason}` : ''}`
+    : 'Venta activa';
+  toggleSaleVoid.hidden = currentRole !== 'admin';
+  toggleSaleVoid.classList.toggle('is-restore', isVoid);
+  toggleSaleVoid.textContent = isVoid ? 'Restaurar venta' : 'Anular venta';
+
   openSaleDetail(true);
 }
+
+async function toggleSelectedSaleVoid() {
+  if (currentRole !== 'admin' || !selectedSaleDetail?.id) return;
+
+  const isVoid = selectedSaleDetail.status === 'void';
+  let reason = '';
+  if (!isVoid) {
+    const confirmed = window.confirm('¿Anular esta venta? Dejará de contar en totales, ganancias y nómina.');
+    if (!confirmed) return;
+    reason = window.prompt('Motivo de la anulación (opcional):', '')?.trim().slice(0, 120) || '';
+  } else {
+    const confirmed = window.confirm('¿Restaurar esta venta? Volverá a contar en los totales y la nómina.');
+    if (!confirmed) return;
+  }
+
+  toggleSaleVoid.disabled = true;
+  try {
+    const nextStatus = isVoid ? 'active' : 'void';
+    const patch = isVoid
+      ? {
+          status: 'active',
+          restoredAt: serverTimestamp(),
+          restoredAtClient: new Date().toISOString(),
+          restoredBy: auth.currentUser?.uid || '',
+          updatedAt: serverTimestamp(),
+        }
+      : {
+          status: 'void',
+          voidReason: reason,
+          voidedAt: serverTimestamp(),
+          voidedAtClient: new Date().toISOString(),
+          voidedBy: auth.currentUser?.uid || '',
+          updatedAt: serverTimestamp(),
+        };
+
+    await setDoc(doc(db, 'sales', selectedSaleDetail.id), patch, { merge: true });
+    selectedSaleDetail = { ...selectedSaleDetail, ...patch, status: nextStatus };
+    if (!isVoid) selectedSaleDetail.voidReason = reason;
+    showSaleDetail(selectedSaleDetail);
+  } catch (error) {
+    console.error(error);
+    detailStatus.classList.add('is-void');
+    detailStatus.textContent = 'No se pudo actualizar esta venta.';
+  } finally {
+    toggleSaleVoid.disabled = false;
+  }
+}
+
+toggleSaleVoid.addEventListener('click', toggleSelectedSaleVoid);
 
 function openSaleOverlay(open) {
   saleOverlay.classList.toggle('is-open', open);
@@ -6644,22 +6613,6 @@ saleSave.addEventListener('click', async () => {
   };
 
   try {
-    if (demoRole) {
-      const demoSale = {
-        id: `demo-${Date.now()}`,
-        ...payload,
-        createdAt: null,
-        createdAtClient: now.toISOString(),
-      };
-      demoSales.unshift(demoSale);
-      loadedSales = [...demoSales];
-      renderMechanicDirectory();
-      refreshHistoryView();
-      refreshAdminRecordsView();
-      setStatus(saleStatus, 'Venta registrada en el historial DEMO.', 'ok');
-      setTimeout(() => openSaleOverlay(false), 650);
-      return;
-    }
 
     await addDoc(collection(db, 'sales'), payload);
     setStatus(saleStatus, 'Venta registrada correctamente.', 'ok');
@@ -6777,6 +6730,7 @@ function renderPayrollPanel() {
   markPayrollPaid.textContent = paid ? 'Pago registrado' : 'Marcar como pagado';
   markPayrollPaid.disabled = paid;
   payrollPaymentMethod.disabled = paid;
+  reopenPayroll.hidden = !paid;
 
   if (paid) {
     const method = record.paymentMethod === 'transfer' ? 'Transferencia'
@@ -6821,12 +6775,6 @@ async function persistMechanicPayrollSettings() {
   if (profile) {
     profile.positionId = positionId;
     profile.bankAccount = bankAccount;
-  }
-
-  if (demoRole) {
-    setStatus(payrollStatus, 'Datos de nómina guardados en la vista DEMO.', 'ok');
-    renderPayrollPanel();
-    return;
   }
 
   try {
@@ -6874,11 +6822,6 @@ async function markSelectedPayrollPaid() {
 
   payrollRecords[payrollRecordKey(selectedHistoryUserId, selectedWeekKey)] = record;
 
-  if (demoRole) {
-    renderPayrollPanel();
-    return;
-  }
-
   try {
     await setDoc(
       doc(db, 'payroll', payrollRecordKey(selectedHistoryUserId, selectedWeekKey)),
@@ -6894,6 +6837,38 @@ async function markSelectedPayrollPaid() {
 
 markPayrollPaid.addEventListener('click', markSelectedPayrollPaid);
 
+async function reopenSelectedPayroll() {
+  if (currentRole !== 'admin' || !selectedHistoryUserId || !selectedWeekKey) return;
+  const record = currentPayrollRecord();
+  if (!record || record.status !== 'paid') return;
+  if (!window.confirm('¿Reabrir este pago? Podrás corregir datos y volver a marcarlo como pagado.')) return;
+
+  const key = payrollRecordKey(selectedHistoryUserId, selectedWeekKey);
+  const next = {
+    ...record,
+    status: 'pending',
+    paymentMethod: '',
+    reopenedAtClient: new Date().toISOString(),
+  };
+  payrollRecords[key] = next;
+
+  try {
+    await setDoc(doc(db, 'payroll', key), {
+      status: 'pending',
+      paymentMethod: '',
+      reopenedAt: serverTimestamp(),
+      reopenedAtClient: next.reopenedAtClient,
+      reopenedBy: auth.currentUser?.uid || '',
+    }, { merge: true });
+    renderPayrollPanel();
+  } catch (error) {
+    console.error(error);
+    setStatus(payrollStatus, 'No se pudo reabrir el pago.', 'error');
+  }
+}
+
+reopenPayroll.addEventListener('click', reopenSelectedPayroll);
+
 function loadPayrollRecord() {
   if (unsubscribePayroll) {
     unsubscribePayroll();
@@ -6901,11 +6876,6 @@ function loadPayrollRecord() {
   }
 
   if (currentRole !== 'admin' || !selectedHistoryUserId || !selectedWeekKey) return;
-
-  if (demoRole) {
-    renderPayrollPanel();
-    return;
-  }
 
   const key = payrollRecordKey(selectedHistoryUserId, selectedWeekKey);
   const ref = doc(db, 'payroll', key);
@@ -7090,20 +7060,26 @@ function refreshAdminRecordsView() {
   renderRecordsWeekTabs();
 
   const queryText = recordsSearch.value.trim().toLowerCase();
-  const sales = loadedSales
-    .filter(sale => sale.status !== 'void')
+  const includeVoided = Boolean(showVoidedRecords?.checked);
+  const weekMatches = loadedSales
     .filter(sale => saleWeekKey(sale) === selectedRecordsWeekKey)
-    .filter(sale => !queryText || searchableSaleText(sale).includes(queryText))
+    .filter(sale => !queryText || searchableSaleText(sale).includes(queryText));
+
+  const sales = weekMatches
+    .filter(sale => includeVoided || sale.status !== 'void')
     .sort((a, b) => saleDateObject(b) - saleDateObject(a));
+  const activeSales = weekMatches.filter(sale => sale.status !== 'void');
+  const voidedCount = weekMatches.filter(sale => sale.status === 'void').length;
 
   recordsWeekLabel.textContent = selectedRecordsWeekKey === currentWeekKey()
     ? `Semana actual · ${formatWeekRange(selectedRecordsWeekKey)}`
     : `Semana cerrada · ${formatWeekRange(selectedRecordsWeekKey)}`;
 
-  recordsCount.textContent = String(sales.length);
-  recordsTotal.textContent = formatMoney(sales.reduce((s, sale) => s + (Number(sale.total) || 0), 0));
-  recordsCost.textContent = formatMoney(sales.reduce((s, sale) => s + (Number(sale.costTotal) || 0), 0));
-  recordsProfit.textContent = formatMoney(sales.reduce((s, sale) => s + (Number(sale.profit) || 0), 0));
+  recordsCount.textContent = String(activeSales.length);
+  recordsTotal.textContent = formatMoney(activeSales.reduce((s, sale) => s + (Number(sale.total) || 0), 0));
+  recordsCost.textContent = formatMoney(activeSales.reduce((s, sale) => s + (Number(sale.costTotal) || 0), 0));
+  recordsProfit.textContent = formatMoney(activeSales.reduce((s, sale) => s + (Number(sale.profit) || 0), 0));
+  setStatus(recordsStatus, includeVoided && voidedCount ? `Mostrando también ${voidedCount} venta${voidedCount === 1 ? '' : 's'} anulada${voidedCount === 1 ? '' : 's'}.` : '');
 
   recordsList.innerHTML = '';
 
@@ -7121,6 +7097,7 @@ function refreshAdminRecordsView() {
     const item = document.createElement('button');
     item.type = 'button';
     item.className = 'history-item';
+    item.classList.toggle('is-void', sale.status === 'void');
     item.addEventListener('click', () => showSaleDetail(sale));
 
     const main = document.createElement('div');
@@ -7162,6 +7139,7 @@ function refreshAdminRecordsView() {
 }
 
 recordsSearch.addEventListener('input', refreshAdminRecordsView);
+showVoidedRecords.addEventListener('change', refreshAdminRecordsView);
 
 
 function fillNewMechanicPositionOptions() {
@@ -7287,6 +7265,90 @@ saveMechanicBtn.addEventListener('click', async () => {
   }
 });
 
+function fillEditMechanicPositionOptions(selectedId = 'mechanic') {
+  if (!editMechanicPosition) return;
+  editMechanicPosition.innerHTML = '';
+  positionCatalog
+    .filter(item => item.active !== false || item.id === selectedId)
+    .forEach(item => {
+      const option = document.createElement('option');
+      option.value = item.id;
+      option.textContent = item.name;
+      editMechanicPosition.appendChild(option);
+    });
+  if ([...editMechanicPosition.options].some(option => option.value === selectedId)) {
+    editMechanicPosition.value = selectedId;
+  }
+}
+
+function openMechanicEdit(profile) {
+  if (!profile?.uid) return;
+  selectedMechanicEditUid = profile.uid;
+  mechanicEditTitle.textContent = `Editar · ${profile.name || profile.email || 'Mecánico'}`;
+  editMechanicName.value = profile.name || '';
+  editMechanicEmail.value = profile.email || '';
+  fillEditMechanicPositionOptions(profile.positionId || 'mechanic');
+  editMechanicBankAccount.value = String(profile.bankAccount || '').slice(0, 10);
+  setStatus(mechanicEditStatus, '');
+  mechanicEditEditor.hidden = false;
+  setTimeout(() => editMechanicName.focus(), 50);
+}
+
+function closeMechanicEdit() {
+  mechanicEditEditor.hidden = true;
+  selectedMechanicEditUid = null;
+  setStatus(mechanicEditStatus, '');
+}
+
+mechanicEditClose.addEventListener('click', closeMechanicEdit);
+cancelMechanicEdit.addEventListener('click', closeMechanicEdit);
+
+saveMechanicEdit.addEventListener('click', async () => {
+  if (currentRole !== 'admin' || !selectedMechanicEditUid) return;
+
+  const name = editMechanicName.value.trim();
+  const positionId = editMechanicPosition.value || 'mechanic';
+  const bankAccount = editMechanicBankAccount.value.trim().slice(0, 10);
+
+  if (!name) {
+    setStatus(mechanicEditStatus, 'Escribe el nombre del mecánico.', 'error');
+    editMechanicName.focus();
+    return;
+  }
+
+  saveMechanicEdit.disabled = true;
+  setStatus(mechanicEditStatus, 'Guardando cambios…');
+  try {
+    await setDoc(doc(db, 'users', selectedMechanicEditUid), {
+      name,
+      positionId,
+      bankAccount,
+      updatedAt: serverTimestamp(),
+      updatedBy: auth.currentUser?.uid || '',
+    }, { merge: true });
+
+    const profile = mechanicProfiles.find(item => item.uid === selectedMechanicEditUid);
+    if (profile) {
+      profile.name = name;
+      profile.positionId = positionId;
+      profile.bankAccount = bankAccount;
+    }
+    if (selectedMechanicProfile?.uid === selectedMechanicEditUid) {
+      selectedMechanicProfile = { ...selectedMechanicProfile, name, positionId, bankAccount };
+      selectedHistoryUserName = name;
+    }
+
+    setStatus(mechanicDirectoryStatus, `${name}: datos actualizados.`, 'ok');
+    closeMechanicEdit();
+    renderMechanicDirectory();
+  } catch (error) {
+    console.error(error);
+    setStatus(mechanicEditStatus, 'No se pudieron guardar los cambios.', 'error');
+  } finally {
+    saveMechanicEdit.disabled = false;
+  }
+});
+
 async function setMechanicActive(profile, active) {
   if (currentRole !== 'admin' || !profile?.uid) return;
   const verb = active ? 'reactivar' : 'dar de baja';
@@ -7396,6 +7458,15 @@ function renderMechanicDirectory() {
     const actions = document.createElement('div');
     actions.className = 'mechanic-directory-actions';
 
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'mechanic-status-action';
+    editBtn.textContent = 'Editar';
+    editBtn.addEventListener('click', event => {
+      event.stopPropagation();
+      openMechanicEdit(profile);
+    });
+
     const statusBtn = document.createElement('button');
     statusBtn.type = 'button';
     statusBtn.className = `mechanic-status-action${active ? ' is-danger' : ''}`;
@@ -7404,7 +7475,7 @@ function renderMechanicDirectory() {
       event.stopPropagation();
       setMechanicActive(profile, !active);
     });
-    actions.appendChild(statusBtn);
+    actions.append(editBtn, statusBtn);
 
     const openProfile = () => {
       selectedHistoryUserId = profile.uid;
@@ -7488,7 +7559,7 @@ function subscribeToCurrentUserProfile(user) {
     unsubscribeCurrentUserProfile = null;
   }
 
-  if (!user || demoRole) return;
+  if (!user) return;
 
   unsubscribeCurrentUserProfile = onSnapshot(
     doc(db, 'users', user.uid),
@@ -7525,10 +7596,6 @@ function subscribeToUsers() {
     return;
   }
 
-  if (demoRole) {
-    renderMechanicDirectory();
-    return;
-  }
 
   setStatus(mechanicDirectoryStatus, 'Cargando mecánicos…');
 
@@ -7559,14 +7626,6 @@ function subscribeToSales(user) {
     unsubscribeSales = null;
   }
 
-  if (demoRole) {
-    loadedSales = [...demoSales];
-    setStatus(historyStatus, 'Vista demo · estos registros no se guardan en Firebase.', 'ok');
-    renderMechanicDirectory();
-    refreshHistoryView();
-    refreshAdminRecordsView();
-    return;
-  }
 
   if (!user) {
     loadedSales = [];
@@ -7614,13 +7673,6 @@ saveBtn.addEventListener('click', async () => {
   try {
     const nextConfig = collectEditorConfig();
 
-    if (demoRole === 'admin') {
-      latestConfig = nextConfig;
-      window.stopCarAdminAPI.applyPriceConfig(nextConfig);
-      buildEditor(nextConfig);
-      setStatus(saveStatus, 'Cambios aplicados en esta vista DEMO.', 'ok');
-      return;
-    }
 
     await setDoc(pricesRef, { ...nextConfig, updatedAt: serverTimestamp() }, { merge: true });
     setStatus(saveStatus, 'Guardado. Las calculadoras abiertas reciben el cambio automáticamente.', 'ok');
@@ -7652,8 +7704,6 @@ setInterval(() => {
 }, 60 * 1000);
 
 onAuthStateChanged(auth, async user => {
-  if (demoRole) return;
-
   const loggedIn = Boolean(user);
   document.body.classList.toggle('session-active', loggedIn);
 
@@ -7723,11 +7773,6 @@ onAuthStateChanged(auth, async user => {
 
 // Lectura pública en tiempo real: cuando la jefa guarda, las calculadoras abiertas cambian solas.
 unsubscribePrices = onSnapshot(pricesRef, snapshot => {
-  if (demoRole) {
-    clearTimeout(priceLoadFallback);
-    finishInitialPriceLoad();
-    return;
-  }
 
   if (!snapshot.exists()) {
     latestConfig = window.stopCarAdminAPI.getPriceConfig();
