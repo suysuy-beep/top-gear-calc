@@ -1639,6 +1639,128 @@ body.demo-mode .top-login-btn::after {
   font-size: 11px;
 }
 
+/* ===== V17: ALTAS Y BAJAS DEL EQUIPO ===== */
+.mechanic-team-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.mechanic-team-filter-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 26px;
+}
+.mechanic-inactive-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #7d898f;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .35px;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+}
+.mechanic-inactive-toggle input {
+  accent-color: var(--accent);
+}
+.mechanic-directory-card {
+  position: relative;
+  grid-template-columns: 42px minmax(0,1fr) auto auto;
+}
+.mechanic-directory-card.is-inactive {
+  opacity: .62;
+  border-style: dashed;
+}
+.mechanic-directory-card.is-inactive .mechanic-avatar {
+  filter: grayscale(.75);
+}
+.mechanic-directory-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: end;
+}
+.mechanic-status-action {
+  min-height: 29px;
+  padding: 5px 8px;
+  border: 1px solid #39454c;
+  border-radius: 6px;
+  background: #0d1316;
+  color: #b9c3c8;
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mechanic-status-action:hover {
+  border-color: rgba(63,211,90,.5);
+  color: #eaffed;
+}
+.mechanic-status-action.is-danger:hover {
+  border-color: rgba(255,105,105,.58);
+  color: #ffd7d7;
+}
+.mechanic-status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border: 1px solid #3a454b;
+  border-radius: 999px;
+  color: #8e9aa0;
+  font-size: 7px;
+  font-weight: 950;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+.mechanic-create-editor {
+  margin-top: 2px;
+}
+.mechanic-create-grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 10px;
+  width: 100%;
+}
+.mechanic-create-note {
+  grid-column: 1 / -1;
+  padding: 9px 10px;
+  border: 1px solid #2e393f;
+  border-radius: 7px;
+  background: #0a0f12;
+  color: #7f8d93;
+  font-size: 8px;
+  line-height: 1.45;
+}
+.mechanic-create-note strong { color: #b9c7be; }
+#newMechanicPassword {
+  letter-spacing: .7px;
+}
+@media (max-width: 620px) {
+  .mechanic-team-toolbar,
+  .mechanic-create-grid {
+    grid-template-columns: 1fr;
+  }
+  .mechanic-team-filter-row {
+    justify-content: flex-start;
+  }
+  .mechanic-directory-card {
+    grid-template-columns: 42px minmax(0,1fr) !important;
+  }
+  .mechanic-directory-week,
+  .mechanic-directory-actions {
+    grid-column: 2;
+    justify-self: start;
+    text-align: left;
+  }
+}
+
 /* ===== SEMANAS ===== */
 .history-week-caption {
   margin: 1px 0 7px;
@@ -3623,18 +3745,78 @@ body.view-admin .admin-detail-only { display: block !important; }
             <div>
               <div class="account-role-badge admin-role">Equipo</div>
               <div class="mechanic-welcome">Equipo contratado</div>
-              <div class="admin-user">Selecciona una persona para revisar su historial, nómina y puesto.</div>
+              <div class="admin-user">Altas, bajas, historial, nómina y puesto del personal.</div>
             </div>
             <button id="mechanicsBack" class="admin-secondary" type="button">Mi cuenta</button>
           </div>
 
-          <label class="history-search-wrap">
-            <span class="history-search-icon">⌕</span>
-            <input id="mechanicSearch" type="search" placeholder="Buscar en el equipo…" autocomplete="off" />
-          </label>
+          <div class="mechanic-team-toolbar">
+            <label class="history-search-wrap">
+              <span class="history-search-icon">⌕</span>
+              <input id="mechanicSearch" type="search" placeholder="Buscar en el equipo…" autocomplete="off" />
+            </label>
+            <button id="newMechanicBtn" class="admin-primary" type="button">+ Agregar mecánico</button>
+          </div>
+
+          <div class="mechanic-team-filter-row">
+            <label class="mechanic-inactive-toggle">
+              <input id="showInactiveMechanics" type="checkbox" />
+              <span>Mostrar bajas</span>
+            </label>
+          </div>
 
           <div id="mechanicDirectoryStatus" class="admin-status" aria-live="polite"></div>
           <div id="mechanicDirectory" class="mechanic-directory"></div>
+
+          <section id="mechanicCreateEditor" class="agreement-editor mechanic-create-editor" hidden>
+            <div class="agreement-editor-head">
+              <div>
+                <div class="history-week-caption">Alta de personal</div>
+                <strong>Nuevo mecánico</strong>
+              </div>
+              <button id="mechanicCreateClose" class="quick-close" type="button">×</button>
+            </div>
+
+            <div class="agreement-editor-body">
+              <div class="mechanic-create-grid">
+                <label class="payroll-field">
+                  <span>Nombre</span>
+                  <input id="newMechanicName" type="text" maxlength="60" placeholder="Ej. Luna" autocomplete="off" />
+                </label>
+
+                <label class="payroll-field">
+                  <span>Correo para iniciar sesión</span>
+                  <input id="newMechanicEmail" type="email" maxlength="120" placeholder="luna@topgear.com" autocomplete="off" />
+                </label>
+
+                <label class="payroll-field">
+                  <span>Contraseña inicial</span>
+                  <input id="newMechanicPassword" type="password" minlength="6" maxlength="72" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+                </label>
+
+                <label class="payroll-field">
+                  <span>Puesto</span>
+                  <select id="newMechanicPosition"></select>
+                </label>
+
+                <label class="payroll-field">
+                  <span>Cuenta bancaria (opcional)</span>
+                  <input id="newMechanicBankAccount" type="text" maxlength="10" inputmode="numeric" placeholder="Máx. 10 caracteres" autocomplete="off" />
+                </label>
+
+                <div class="mechanic-create-note">
+                  <strong>La contraseña no se guarda en la calculadora.</strong> Tú se la entregas al mecánico por fuera. Al crear la cuenta queda activa inmediatamente.
+                </div>
+              </div>
+            </div>
+
+            <div class="agreement-editor-actions">
+              <span></span><span></span>
+              <button id="cancelMechanicCreate" class="admin-secondary" type="button">Cancelar</button>
+              <button id="saveMechanicBtn" class="admin-primary" type="button">Crear mecánico</button>
+            </div>
+            <div id="mechanicCreateStatus" class="admin-status" aria-live="polite"></div>
+          </section>
         </div>
 
         <div id="historyPanel" class="history-panel" hidden>
@@ -4819,7 +5001,7 @@ render();
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, deleteUser, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, addDoc, collection, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -4835,6 +5017,11 @@ const app = initializeApp(firebaseConfig);
 console.info('Top Gear Firebase:', firebaseConfig.projectId);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Instancia separada: permite que el admin cree la cuenta de un mecánico
+// sin reemplazar su propia sesión en la calculadora.
+const userCreatorApp = initializeApp(firebaseConfig, 'topgear-user-creator');
+const userCreatorAuth = getAuth(userCreatorApp);
 const pricesRef = doc(db, 'config', 'topgear_prices');
 const agreementsRef = doc(db, 'config', 'topgear_agreements');
 const positionsRef = doc(db, 'config', 'topgear_positions');
@@ -4918,6 +5105,18 @@ const mechanicsBack = document.querySelector('#mechanicsBack');
 const mechanicSearch = document.querySelector('#mechanicSearch');
 const mechanicDirectory = document.querySelector('#mechanicDirectory');
 const mechanicDirectoryStatus = document.querySelector('#mechanicDirectoryStatus');
+const newMechanicBtn = document.querySelector('#newMechanicBtn');
+const showInactiveMechanics = document.querySelector('#showInactiveMechanics');
+const mechanicCreateEditor = document.querySelector('#mechanicCreateEditor');
+const mechanicCreateClose = document.querySelector('#mechanicCreateClose');
+const cancelMechanicCreate = document.querySelector('#cancelMechanicCreate');
+const saveMechanicBtn = document.querySelector('#saveMechanicBtn');
+const mechanicCreateStatus = document.querySelector('#mechanicCreateStatus');
+const newMechanicName = document.querySelector('#newMechanicName');
+const newMechanicEmail = document.querySelector('#newMechanicEmail');
+const newMechanicPassword = document.querySelector('#newMechanicPassword');
+const newMechanicPosition = document.querySelector('#newMechanicPosition');
+const newMechanicBankAccount = document.querySelector('#newMechanicBankAccount');
 
 const accountShortcuts = document.querySelector('#accountShortcuts');
 const mechanicMenuOnlyItems = [...document.querySelectorAll('.mechanic-menu-only')];
@@ -5057,6 +5256,7 @@ function normalizePositionsConfig(list) {
 function applyPositionsConfig(list) {
   positionCatalog = normalizePositionsConfig(list);
   fillPayrollPositionOptions();
+  fillNewMechanicPositionOptions();
   renderMechanicDirectory();
   if (!adminPositionsPanel.hidden) renderPositionsAdminList();
   if (!historyPanel.hidden && currentRole === 'admin' && selectedHistoryUserId) renderPayrollPanel();
@@ -6107,6 +6307,7 @@ function setAccountView(view) {
       selectedHistoryUserId = null;
       selectedHistoryUserName = '';
       selectedMechanicProfile = null;
+      setMechanicCreateOpen(false);
       renderMechanicDirectory();
     } else {
       historyPanel.hidden = false;
@@ -6962,34 +7163,189 @@ function refreshAdminRecordsView() {
 
 recordsSearch.addEventListener('input', refreshAdminRecordsView);
 
+
+function fillNewMechanicPositionOptions() {
+  if (!newMechanicPosition) return;
+  const wanted = newMechanicPosition.value || 'mechanic';
+  newMechanicPosition.innerHTML = '';
+
+  positionCatalog
+    .filter(item => item.active !== false)
+    .forEach(item => {
+      const option = document.createElement('option');
+      option.value = item.id;
+      option.textContent = item.name;
+      newMechanicPosition.appendChild(option);
+    });
+
+  if ([...newMechanicPosition.options].some(option => option.value === wanted)) {
+    newMechanicPosition.value = wanted;
+  } else if ([...newMechanicPosition.options].some(option => option.value === 'mechanic')) {
+    newMechanicPosition.value = 'mechanic';
+  }
+}
+
+function resetMechanicCreateForm() {
+  newMechanicName.value = '';
+  newMechanicEmail.value = '';
+  newMechanicPassword.value = '';
+  newMechanicBankAccount.value = '';
+  fillNewMechanicPositionOptions();
+  if ([...newMechanicPosition.options].some(option => option.value === 'mechanic')) {
+    newMechanicPosition.value = 'mechanic';
+  }
+  setStatus(mechanicCreateStatus, '');
+}
+
+function setMechanicCreateOpen(open) {
+  mechanicCreateEditor.hidden = !open;
+  if (open) {
+    resetMechanicCreateForm();
+    setTimeout(() => newMechanicName.focus(), 60);
+  }
+}
+
+newMechanicBtn.addEventListener('click', () => setMechanicCreateOpen(true));
+mechanicCreateClose.addEventListener('click', () => setMechanicCreateOpen(false));
+cancelMechanicCreate.addEventListener('click', () => setMechanicCreateOpen(false));
+showInactiveMechanics.addEventListener('change', renderMechanicDirectory);
+
+function friendlyCreateMechanicError(error) {
+  const code = String(error?.code || '');
+  if (code.includes('email-already-in-use')) return 'Ese correo ya tiene una cuenta en Firebase.';
+  if (code.includes('invalid-email')) return 'El correo no tiene un formato válido.';
+  if (code.includes('weak-password')) return 'La contraseña necesita al menos 6 caracteres.';
+  if (code.includes('operation-not-allowed')) return 'Email/Password no está habilitado en Authentication.';
+  if (code.includes('too-many-requests')) return 'Firebase bloqueó temporalmente demasiados intentos. Intenta más tarde.';
+  if (code.includes('permission-denied')) return 'La cuenta se creó, pero Firestore bloqueó el perfil. Revisa las Rules.';
+  return 'No se pudo crear el mecánico. Revisa Firebase e inténtalo otra vez.';
+}
+
+saveMechanicBtn.addEventListener('click', async () => {
+  if (currentRole !== 'admin' || !auth.currentUser) return;
+
+  const name = newMechanicName.value.trim();
+  const email = newMechanicEmail.value.trim().toLowerCase();
+  const password = newMechanicPassword.value;
+  const positionId = newMechanicPosition.value || 'mechanic';
+  const bankAccount = newMechanicBankAccount.value.trim().slice(0, 10);
+
+  if (!name) {
+    setStatus(mechanicCreateStatus, 'Escribe el nombre del mecánico.', 'error');
+    newMechanicName.focus();
+    return;
+  }
+  if (!email) {
+    setStatus(mechanicCreateStatus, 'Escribe el correo que usará para iniciar sesión.', 'error');
+    newMechanicEmail.focus();
+    return;
+  }
+  if (password.length < 6) {
+    setStatus(mechanicCreateStatus, 'La contraseña debe tener al menos 6 caracteres.', 'error');
+    newMechanicPassword.focus();
+    return;
+  }
+
+  saveMechanicBtn.disabled = true;
+  setStatus(mechanicCreateStatus, 'Creando cuenta y perfil…');
+
+  let createdCredential = null;
+  try {
+    // 1) Authentication: la cuenta con el correo/contraseña que tú entregarás por fuera.
+    createdCredential = await createUserWithEmailAndPassword(userCreatorAuth, email, password);
+
+    // 2) Firestore: el perfil que autoriza el acceso real a la calculadora.
+    await setDoc(doc(db, 'users', createdCredential.user.uid), {
+      name,
+      email,
+      role: 'mechanic',
+      active: true,
+      positionId,
+      bankAccount,
+      createdAt: serverTimestamp(),
+      createdBy: auth.currentUser.uid,
+      updatedAt: serverTimestamp(),
+    });
+
+    await signOut(userCreatorAuth);
+    newMechanicPassword.value = '';
+    setStatus(mechanicDirectoryStatus, `${name} fue agregado al equipo. Ya puede iniciar sesión.`, 'ok');
+    setMechanicCreateOpen(false);
+  } catch (error) {
+    console.error('No se pudo crear el mecánico.', error);
+
+    // Si Auth sí alcanzó a crear la cuenta pero Firestore falló,
+    // intentamos borrar esa cuenta recién creada para no dejar un usuario huérfano.
+    if (createdCredential?.user) {
+      try { await deleteUser(createdCredential.user); } catch (cleanupError) { console.error('No se pudo limpiar la cuenta incompleta.', cleanupError); }
+    }
+    try { await signOut(userCreatorAuth); } catch {}
+
+    setStatus(mechanicCreateStatus, friendlyCreateMechanicError(error), 'error');
+  } finally {
+    saveMechanicBtn.disabled = false;
+  }
+});
+
+async function setMechanicActive(profile, active) {
+  if (currentRole !== 'admin' || !profile?.uid) return;
+  const verb = active ? 'reactivar' : 'dar de baja';
+  const confirmed = window.confirm(`¿Quieres ${verb} a ${profile.name || profile.email || 'este mecánico'}?`);
+  if (!confirmed) return;
+
+  try {
+    await setDoc(doc(db, 'users', profile.uid), {
+      active,
+      updatedAt: serverTimestamp(),
+      statusUpdatedBy: auth.currentUser?.uid || '',
+    }, { merge: true });
+    setStatus(
+      mechanicDirectoryStatus,
+      active ? 'Mecánico reactivado.' : 'Mecánico dado de baja. Su historial se conserva.',
+      'ok'
+    );
+  } catch (error) {
+    console.error(error);
+    setStatus(mechanicDirectoryStatus, 'No se pudo actualizar el estado del mecánico.', 'error');
+  }
+}
+
 function renderMechanicDirectory() {
   if (currentRole !== 'admin') return;
 
   const search = mechanicSearch.value.trim().toLowerCase();
   const currentKey = currentWeekKey();
+  const includeInactive = Boolean(showInactiveMechanics?.checked);
 
-  const activeMechanics = mechanicProfiles
+  const mechanics = mechanicProfiles
     .filter(profile => String(profile.role || '').toLowerCase() === 'mechanic')
-    .filter(profile => profile.active !== false)
+    .filter(profile => includeInactive || profile.active !== false)
     .filter(profile => {
-      const haystack = [profile.name, profile.email].filter(Boolean).join(' ').toLowerCase();
+      const haystack = [profile.name, profile.email, positionLabelFromProfile(profile)].filter(Boolean).join(' ').toLowerCase();
       return !search || haystack.includes(search);
     })
-    .sort((a, b) => String(a.name || a.email || '').localeCompare(String(b.name || b.email || ''), 'es'));
+    .sort((a, b) => {
+      const statusSort = Number(a.active === false) - Number(b.active === false);
+      if (statusSort !== 0) return statusSort;
+      return String(a.name || a.email || '').localeCompare(String(b.name || b.email || ''), 'es');
+    });
 
   mechanicDirectory.innerHTML = '';
 
-  if (!activeMechanics.length) {
+  if (!mechanics.length) {
     const empty = document.createElement('div');
     empty.className = 'directory-empty';
     empty.textContent = search
-      ? 'No encontré mecánicos con ese nombre.'
-      : 'Todavía no hay mecánicos activos registrados.';
+      ? 'No encontré personas con esa búsqueda.'
+      : includeInactive
+        ? 'Todavía no hay mecánicos registrados.'
+        : 'Todavía no hay mecánicos activos. Puedes agregar uno arriba.';
     mechanicDirectory.appendChild(empty);
     return;
   }
 
-  activeMechanics.forEach(profile => {
+  mechanics.forEach(profile => {
+    const active = profile.active !== false;
     const sales = loadedSales.filter(sale =>
       sale.userId === profile.uid &&
       sale.status !== 'void' &&
@@ -6998,9 +7354,11 @@ function renderMechanicDirectory() {
 
     const weeklyTotal = sales.reduce((sum, sale) => sum + (Number(sale.total) || 0), 0);
 
-    const card = document.createElement('button');
-    card.type = 'button';
+    const card = document.createElement('div');
     card.className = 'mechanic-directory-card';
+    card.classList.toggle('is-inactive', !active);
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
 
     const avatar = document.createElement('div');
     avatar.className = 'mechanic-avatar';
@@ -7011,10 +7369,15 @@ function renderMechanicDirectory() {
     const name = document.createElement('div');
     name.className = 'mechanic-directory-name';
     name.textContent = profile.name || profile.email || 'Mecánico';
+    if (!active) {
+      const badge = document.createElement('span');
+      badge.className = 'mechanic-status-badge';
+      badge.textContent = 'Baja';
+      name.appendChild(badge);
+    }
 
     const meta = document.createElement('div');
     meta.className = 'mechanic-directory-meta';
-    const payrollDefaults = profilePayrollDefaults(profile);
     meta.textContent = `${positionLabelFromProfile(profile)} · ${sales.length} venta${sales.length === 1 ? '' : 's'} esta semana${profile.email ? ` · ${profile.email}` : ''}`;
 
     info.append(name, meta);
@@ -7023,15 +7386,27 @@ function renderMechanicDirectory() {
     week.className = 'mechanic-directory-week';
 
     const label = document.createElement('span');
-    label.textContent = 'Semana actual';
+    label.textContent = active ? 'Semana actual' : 'Histórico';
 
     const amount = document.createElement('strong');
     amount.textContent = formatMoney(weeklyTotal);
 
     week.append(label, amount);
-    card.append(avatar, info, week);
 
-    card.addEventListener('click', () => {
+    const actions = document.createElement('div');
+    actions.className = 'mechanic-directory-actions';
+
+    const statusBtn = document.createElement('button');
+    statusBtn.type = 'button';
+    statusBtn.className = `mechanic-status-action${active ? ' is-danger' : ''}`;
+    statusBtn.textContent = active ? 'Dar de baja' : 'Reactivar';
+    statusBtn.addEventListener('click', event => {
+      event.stopPropagation();
+      setMechanicActive(profile, !active);
+    });
+    actions.appendChild(statusBtn);
+
+    const openProfile = () => {
       selectedHistoryUserId = profile.uid;
       selectedHistoryUserName = profile.name || profile.email || 'Mecánico';
       selectedMechanicProfile = profile;
@@ -7040,14 +7415,23 @@ function renderMechanicDirectory() {
 
       adminMechanicsPanel.hidden = true;
       historyPanel.hidden = false;
-      setAdminHeader(selectedHistoryUserName, `• ${positionLabelFromProfile(profile)}`, 'history');
+      setAdminHeader(selectedHistoryUserName, `${active ? '•' : '• BAJA ·'} ${positionLabelFromProfile(profile)}`, 'history');
       historyTitle.textContent = selectedHistoryUserName;
-      historySubtitle.textContent = 'Historial semanal del mecánico';
+      historySubtitle.textContent = active ? 'Historial semanal del mecánico' : 'Historial conservado · usuario dado de baja';
 
       refreshHistoryView();
       loadPayrollRecord();
+    };
+
+    card.addEventListener('click', openProfile);
+    card.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openProfile();
+      }
     });
 
+    card.append(avatar, info, week, actions);
     mechanicDirectory.appendChild(card);
   });
 }
