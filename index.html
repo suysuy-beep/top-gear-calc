@@ -806,6 +806,31 @@ body.prices-loading .price-boot {
 }
 
 
+/* ===== ACCESO OBLIGATORIO ===== */
+body.auth-locked .app-shell {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+body.auth-locked .price-boot {
+  display: none !important;
+}
+
+body.auth-locked #adminClose {
+  display: none !important;
+}
+
+body.auth-locked .admin-overlay {
+  background: rgba(3, 6, 5, .96);
+  backdrop-filter: blur(10px);
+}
+
+body.auth-locked .admin-card {
+  box-shadow: 0 30px 100px rgba(0,0,0,.72), 0 0 42px rgba(63,211,90,.06);
+}
+
 /* ===== TOP GEAR VISUAL THEME ===== */
 body {
   background:
@@ -3678,7 +3703,7 @@ body.view-admin .admin-detail-only { display: block !important; }
 
 </style>
 </head>
-<body class="prices-loading">
+<body class="prices-loading auth-locked">
   <div id="priceBoot" class="price-boot" aria-live="polite">
     <div class="price-boot-inner"><span class="price-boot-dot"></span><span>Cargando precios…</span></div>
   </div>
@@ -3892,7 +3917,7 @@ body.view-admin .admin-detail-only { display: block !important; }
       </div>
       <div class="admin-body">
         <form id="adminLogin" class="admin-login">
-          <div class="admin-login-note">Entra con tu cuenta de Top Gear. El sistema mostrará las opciones disponibles según tu perfil.</div>
+          <div class="admin-login-note">Inicia sesión para acceder a la calculadora de Top Gear. El acceso es obligatorio para todo el personal.</div>
           <div class="admin-field"><label for="adminEmail">Correo</label><input id="adminEmail" type="email" autocomplete="username" required /></div>
           <div class="admin-field"><label for="adminPassword">Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password" required /></div>
           <button id="adminLoginBtn" class="admin-primary" type="submit">Iniciar sesión</button>
@@ -5947,6 +5972,9 @@ function setStatus(el, message = '', type = '') {
 }
 
 function setAdminOpen(open) {
+  if (!open && !auth.currentUser && document.body.classList.contains('auth-locked')) {
+    return;
+  }
   overlay.classList.toggle('is-open', open);
   overlay.setAttribute('aria-hidden', String(!open));
   launcher.setAttribute('aria-expanded', String(open));
@@ -6790,7 +6818,7 @@ function showAccountSession() {
 
   if (!hasSession()) {
     loginForm.hidden = false;
-    setAdminHeader('Iniciar sesión', 'Accede con tu cuenta de Top Gear');
+    setAdminHeader('Iniciar sesión', 'Acceso obligatorio a la calculadora');
   } else {
     accountSessionPanel.hidden = false;
     const user = effectiveUser();
@@ -8560,6 +8588,8 @@ setInterval(() => {
 onAuthStateChanged(auth, async user => {
   const loggedIn = Boolean(user);
   document.body.classList.toggle('session-active', loggedIn);
+  // La calculadora permanece oculta hasta validar también el perfil de Firestore.
+  document.body.classList.add('auth-locked');
 
   hideAllAccountPanels();
   accountShortcuts.hidden = true;
@@ -8571,7 +8601,6 @@ onAuthStateChanged(auth, async user => {
   currentProfile = null;
 
   if (!loggedIn) {
-    const overlayWasOpen = overlay.classList.contains('is-open');
     if (unsubscribeCurrentUserProfile) {
       unsubscribeCurrentUserProfile();
       unsubscribeCurrentUserProfile = null;
@@ -8580,9 +8609,25 @@ onAuthStateChanged(auth, async user => {
       unsubscribePayroll();
       unsubscribePayroll = null;
     }
+    if (unsubscribeUsers) {
+      unsubscribeUsers();
+      unsubscribeUsers = null;
+    }
+    if (unsubscribeAgreements) {
+      unsubscribeAgreements();
+      unsubscribeAgreements = null;
+    }
+    if (unsubscribePositions) {
+      unsubscribePositions();
+      unsubscribePositions = null;
+    }
+    if (unsubscribePrices) {
+      unsubscribePrices();
+      unsubscribePrices = null;
+    }
 
     sessionLauncherText.textContent = 'Iniciar sesión';
-    setAdminHeader('Iniciar sesión', 'Accede con tu cuenta de Top Gear');
+    setAdminHeader('Iniciar sesión', 'Acceso obligatorio a la calculadora');
     userLabel.textContent = '';
     adminHomeUser.textContent = '';
     mechanicUser.textContent = '';
@@ -8593,14 +8638,8 @@ onAuthStateChanged(auth, async user => {
     window.stopCarAdminAPI.setCatalogRole('mechanic');
 
     subscribeToSales(null);
-    subscribeToUsers();
-    subscribeToAgreements();
-    subscribeToPositions();
-
-    if (overlayWasOpen) {
-      loginForm.hidden = false;
-      setAdminOpen(true);
-    }
+    loginForm.hidden = false;
+    setAdminOpen(true);
     return;
   }
 
@@ -8622,43 +8661,54 @@ onAuthStateChanged(auth, async user => {
 
   if (!applyCurrentUserProfile(user, profile)) return;
 
+  document.body.classList.remove('auth-locked');
+
   if (hasPermission('positions-edit')) {
     await bootstrapFirebaseConfigIfAdmin();
   }
 
-  defaultAccountView();
   subscribeToCurrentUserProfile(user);
   subscribeToSales(user);
   subscribeToUsers();
   subscribeToAgreements();
   subscribeToPositions();
+  subscribeToPrices();
+
+  hideAllAccountPanels();
+  setAdminOpen(false);
 });
 
-// Lectura pública en tiempo real: cuando la jefa guarda, las calculadoras abiertas cambian solas.
-unsubscribePrices = onSnapshot(pricesRef, snapshot => {
+// Precios en tiempo real, únicamente después de validar una sesión activa.
+function subscribeToPrices() {
+  if (unsubscribePrices) {
+    unsubscribePrices();
+    unsubscribePrices = null;
+  }
 
-  if (!snapshot.exists()) {
-    latestConfig = window.stopCarAdminAPI.getPriceConfig();
-    if (auth.currentUser) buildEditor(latestConfig);
+  unsubscribePrices = onSnapshot(pricesRef, snapshot => {
+    if (!snapshot.exists()) {
+      latestConfig = window.stopCarAdminAPI.getPriceConfig();
+      if (auth.currentUser) buildEditor(latestConfig);
+      clearTimeout(priceLoadFallback);
+      finishInitialPriceLoad();
+      return;
+    }
+
+    latestConfig = snapshot.data();
+    window.stopCarAdminAPI.applyPriceConfig(latestConfig);
+
+    if (auth.currentUser && !document.activeElement?.classList?.contains('admin-price-input')) {
+      buildEditor(latestConfig);
+    }
+
     clearTimeout(priceLoadFallback);
     finishInitialPriceLoad();
-    return;
-  }
-
-  latestConfig = snapshot.data();
-  window.stopCarAdminAPI.applyPriceConfig(latestConfig);
-
-  if (auth.currentUser && !document.activeElement?.classList?.contains('admin-price-input')) {
-    buildEditor(latestConfig);
-  }
-
-  clearTimeout(priceLoadFallback);
-  finishInitialPriceLoad();
-}, error => {
-  console.warn('No se pudieron leer precios remotos; se usan los precios incluidos en la página.', error);
-  clearTimeout(priceLoadFallback);
-  finishInitialPriceLoad();
-});
+  }, error => {
+    console.warn('No se pudieron leer precios remotos; se usan los precios incluidos en la página.', error);
+    clearTimeout(priceLoadFallback);
+    finishInitialPriceLoad();
+  });
+}
 </script>
 
 
