@@ -1328,8 +1328,11 @@ body.session-active .top-login-btn {
 
 body.view-admin .admin-catalog-only { display: block !important; }
 body.view-admin .admin-summary-only { display: flex !important; }
-body.view-admin .admin-history-only { display: block !important; }
-body.view-payroll #payrollPanel { display: block !important; }
+/* Los datos financieros generales pertenecen a REGISTROS, no a "Mis ventas". */
+body.view-record-financials #adminRecordsPanel .admin-history-only { display: block !important; }
+/* En el historial de un empleado sí mostramos costo/ganancia; la nómina requiere permiso aparte. */
+body.history-team-context #historyPanel .admin-history-only:not(#payrollPanel) { display: block !important; }
+body.history-team-context.view-payroll #payrollPanel { display: block !important; }
 body.view-void-actions .sale-detail-admin-actions.admin-detail-only { display: flex !important; }
 
 body.view-admin .table-head,
@@ -6747,6 +6750,7 @@ accountMenuItems.forEach(btn => {
 
 function hideAllAccountPanels() {
   adminCard?.classList.remove('is-account-session');
+  document.body.classList.remove('history-team-context');
   loginForm.hidden = true;
   accountSessionPanel.hidden = true;
   editor.hidden = true;
@@ -6843,6 +6847,7 @@ function setAccountView(view) {
 
   } else if (view === 'my-history') {
     historyContext = 'self';
+    document.body.classList.remove('history-team-context');
     historyPanel.hidden = false;
     selectedHistoryUserId = effectiveUser()?.uid || null;
     selectedHistoryUserName = saleDisplayName();
@@ -6850,7 +6855,7 @@ function setAccountView(view) {
     selectedWeekKey = getWeekKey(new Date());
     setAdminHeader('Mis ventas', currentProfile?.name || positionLabelFromProfile(currentProfile) || 'Personal');
     refreshHistoryView();
-    if (hasPermission('payroll-view')) loadPayrollRecord();
+    /* La nómina solo se carga cuando Gerencia/Jefe de mecánicos abre a alguien desde Equipo. */
 
   } else if (view === 'history') {
     if (hasPermission('team-view')) {
@@ -8313,6 +8318,7 @@ function renderMechanicDirectory() {
 
     const openProfile = () => {
       historyContext = 'team';
+      document.body.classList.add('history-team-context');
       selectedHistoryUserId = profile.uid;
       selectedHistoryUserName = profile.name || profile.email || 'Mecánico';
       selectedMechanicProfile = profile;
@@ -8381,6 +8387,7 @@ function applyCurrentUserProfile(user, profile) {
   mechanicMenuOnlyItems.forEach(item => item.hidden = false);
   accountMenuButton.hidden = false;
   document.body.classList.toggle('view-admin', currentRole === 'admin');
+  document.body.classList.toggle('view-record-financials', hasPermission('records'));
   document.body.classList.toggle('view-payroll', hasPermission('payroll-view'));
   document.body.classList.toggle('view-void-actions', canDirectVoidSales() || canUseVoidCode());
   window.stopCarAdminAPI.setCatalogRole(currentRole);
@@ -8581,7 +8588,7 @@ onAuthStateChanged(auth, async user => {
     emailInput.value = '';
     passwordInput.value = '';
     setStatus(loginStatus, '');
-    document.body.classList.remove('view-admin', 'view-payroll', 'view-void-actions');
+    document.body.classList.remove('view-admin', 'view-record-financials', 'view-payroll', 'view-void-actions', 'history-team-context');
     window.stopCarAdminAPI.setCatalogRole('mechanic');
 
     subscribeToSales(null);
