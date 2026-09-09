@@ -3932,7 +3932,7 @@ body.view-admin .admin-detail-only { display: block !important; }
           <li>Motor correspondiente: i4, V6, V8 o V12</li>
           <li>Turbocharger</li>
           <li>Frenos cerámicos</li>
-          <li>Llantas Semi-Slick</li>
+          <li>Llantas Semi-Slick (carretera - montaña)</li>
           <li>AWD</li>
         </ul>
         <div class="package-info-foot">El precio se cobra como paquete cerrado; las piezas incluidas no se cobran individualmente.</div>
@@ -4243,32 +4243,7 @@ body.view-admin .admin-detail-only { display: block !important; }
               </label>
               <label class="payroll-field">
                 <span>Desde</span>
-                <select id="recordsStartHour">
-                  <option value="0">00:00 · todo el día</option>
-                  <option value="1">01:00 en adelante</option>
-                  <option value="2">02:00 en adelante</option>
-                  <option value="3">03:00 en adelante</option>
-                  <option value="4">04:00 en adelante</option>
-                  <option value="5">05:00 en adelante</option>
-                  <option value="6">06:00 en adelante</option>
-                  <option value="7">07:00 en adelante</option>
-                  <option value="8">08:00 en adelante</option>
-                  <option value="9">09:00 en adelante</option>
-                  <option value="10">10:00 en adelante</option>
-                  <option value="11">11:00 en adelante</option>
-                  <option value="12">12:00 en adelante</option>
-                  <option value="13">13:00 en adelante</option>
-                  <option value="14">14:00 en adelante</option>
-                  <option value="15">15:00 en adelante</option>
-                  <option value="16">16:00 en adelante</option>
-                  <option value="17">17:00 en adelante</option>
-                  <option value="18">18:00 en adelante</option>
-                  <option value="19">19:00 en adelante</option>
-                  <option value="20">20:00 en adelante</option>
-                  <option value="21">21:00 en adelante</option>
-                  <option value="22">22:00 en adelante</option>
-                  <option value="23">23:00 en adelante</option>
-                </select>
+                <input id="recordsStartTime" type="time" value="00:00" step="60" aria-label="Hora desde la que se mostrarán los registros" />
               </label>
             </div>
 
@@ -5820,7 +5795,7 @@ const generateVoidCodeBtn = document.querySelector('#generateVoidCodeBtn');
 const copyVoidCodeBtn = document.querySelector('#copyVoidCodeBtn');
 const recordsSearch = document.querySelector('#recordsSearch');
 const recordsDate = document.querySelector('#recordsDate');
-const recordsStartHour = document.querySelector('#recordsStartHour');
+const recordsStartTime = document.querySelector('#recordsStartTime');
 const showVoidedRecords = document.querySelector('#showVoidedRecords');
 const recordsWeekTabs = document.querySelector('#recordsWeekTabs');
 const recordsWeekLabel = document.querySelector('#recordsWeekLabel');
@@ -7000,7 +6975,7 @@ function setAccountView(view) {
     recordsSearch.value = '';
     recordsDate.max = dateKeyLocal(new Date());
     recordsDate.value = dateKeyLocal(new Date());
-    recordsStartHour.value = '0';
+    recordsStartTime.value = '00:00';
     showVoidedRecords.checked = false;
     refreshAdminRecordsView();
     refreshVoidCodePanel();
@@ -8018,10 +7993,20 @@ function selectedRecordsDateObject() {
   return new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
 }
 
-function isSaleInSelectedRecordsPeriod(sale, selectedDate, startHour = 0) {
+function selectedRecordsStartMinutes() {
+  const raw = recordsStartTime?.value || '00:00';
+  const match = String(raw).match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return 0;
+  const hours = Math.min(23, Math.max(0, Number(match[1]) || 0));
+  const minutes = Math.min(59, Math.max(0, Number(match[2]) || 0));
+  return (hours * 60) + minutes;
+}
+
+function isSaleInSelectedRecordsPeriod(sale, selectedDate, startMinutes = 0) {
   const date = saleDateObject(sale);
   if (dateKeyLocal(date) !== dateKeyLocal(selectedDate)) return false;
-  return date.getHours() >= startHour;
+  const saleMinutes = (date.getHours() * 60) + date.getMinutes();
+  return saleMinutes >= startMinutes;
 }
 
 function refreshAdminRecordsView() {
@@ -8030,10 +8015,10 @@ function refreshAdminRecordsView() {
   const queryText = recordsSearch.value.trim().toLowerCase();
   const includeVoided = Boolean(showVoidedRecords?.checked);
   const selectedDate = selectedRecordsDateObject();
-  const startHour = Math.min(23, Math.max(0, Number(recordsStartHour?.value) || 0));
+  const startMinutes = selectedRecordsStartMinutes();
 
   const periodMatches = loadedSales
-    .filter(sale => isSaleInSelectedRecordsPeriod(sale, selectedDate, startHour))
+    .filter(sale => isSaleInSelectedRecordsPeriod(sale, selectedDate, startMinutes))
     .filter(sale => !queryText || searchableSaleText(sale).includes(queryText));
 
   const allMatchingSales = periodMatches
@@ -8051,7 +8036,11 @@ function refreshAdminRecordsView() {
     month: '2-digit',
     year: 'numeric',
   });
-  const timeLabel = startHour === 0 ? 'Todo el día' : `Desde ${String(startHour).padStart(2, '0')}:00`;
+  const startHours = Math.floor(startMinutes / 60);
+  const startMins = startMinutes % 60;
+  const timeLabel = startMinutes === 0
+    ? 'Todo el día'
+    : `Desde ${String(startHours).padStart(2, '0')}:${String(startMins).padStart(2, '0')}`;
   recordsWeekLabel.textContent = `${dayLabel} · ${timeLabel}`;
 
   recordsCount.textContent = String(activeSales.length);
@@ -8140,7 +8129,11 @@ recordsDate.addEventListener('change', () => {
   recordsVisibleCount = 5;
   refreshAdminRecordsView();
 });
-recordsStartHour.addEventListener('change', () => {
+recordsStartTime.addEventListener('input', () => {
+  recordsVisibleCount = 5;
+  refreshAdminRecordsView();
+});
+recordsStartTime.addEventListener('change', () => {
   recordsVisibleCount = 5;
   refreshAdminRecordsView();
 });
