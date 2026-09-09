@@ -4160,6 +4160,7 @@ body.view-admin .admin-detail-only { display: block !important; }
                   <select id="agreementGroupInput">
                     <option value="mafias">Mafia</option>
                     <option value="organizations">Organización</option>
+                    <option value="businesses">Negocio</option>
                     <option value="staff">Staff</option>
                   </select>
                 </label>
@@ -4877,6 +4878,11 @@ const agreementGroups = [
     ],
   },
   {
+    id: 'businesses',
+    title: 'NEGOCIOS',
+    agreements: [],
+  },
+  {
     id: 'staff',
     title: 'STAFF',
     agreements: [],
@@ -4897,13 +4903,14 @@ function normalizeAgreementConfig(config) {
   const fallbackTitles = {
     mafias: 'MAFIAS',
     organizations: 'ORGANIZACIONES',
+    businesses: 'NEGOCIOS',
     staff: 'STAFF',
   };
 
   const incoming = Array.isArray(config) ? config : [];
   const byId = Object.fromEntries(incoming.map(group => [group.id, group]));
 
-  return ['mafias', 'organizations', 'staff'].map(id => {
+  return ['mafias', 'organizations', 'businesses', 'staff'].map(id => {
     const source = byId[id] || {};
     return {
       id,
@@ -6393,11 +6400,24 @@ async function bootstrapFirebaseConfigIfAdmin() {
           agreementsRef,
           {
             groups: window.topGearAgreementsAPI.getConfig(),
+            schemaVersion: 2,
             updatedAt: serverTimestamp(),
           },
           { merge: true }
         )
       );
+    } else {
+      const agreementData = agreementSnap.data() || {};
+      const existingGroups = Array.isArray(agreementData.groups) ? agreementData.groups : [];
+      const hasBusinessesGroup = existingGroups.some(group => String(group?.id || '') === 'businesses');
+      if (!hasBusinessesGroup || Number(agreementData.schemaVersion || 0) < 2) {
+        const migratedGroups = normalizeAgreementConfig(existingGroups);
+        writes.push(setDoc(agreementsRef, {
+          groups: migratedGroups,
+          schemaVersion: 2,
+          updatedAt: serverTimestamp(),
+        }, { merge: true }));
+      }
     }
 
     if (writes.length) {
@@ -6670,6 +6690,7 @@ async function persistAgreementsConfig(config) {
 
   await setDoc(agreementsRef, {
     groups: config,
+    schemaVersion: 2,
     updatedAt: serverTimestamp(),
   }, { merge: true });
 
