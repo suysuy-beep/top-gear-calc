@@ -3241,6 +3241,13 @@ body.view-admin .admin-detail-only { display: block !important; }
   display: none !important;
 }
 
+.records-load-more {
+  display: block;
+  width: min(260px, 100%);
+  margin: 14px auto 2px;
+}
+.records-load-more[hidden] { display: none !important; }
+
 /* Cuenta = una sola superficie, sin tarjeta dentro de tarjeta */
 .admin-card.is-account-session {
   width: min(1160px, 94vw);
@@ -4215,8 +4222,8 @@ body.view-admin .admin-detail-only { display: block !important; }
           </section>
 
           <div>
-            <div class="history-week-caption">Semanas</div>
-            <div id="recordsWeekTabs" class="history-week-tabs"></div>
+            <div class="history-week-caption">Registros del día</div>
+            <div id="recordsWeekTabs" class="history-week-tabs" hidden></div>
           </div>
 
           <div id="recordsWeekLabel" class="history-week-label"></div>
@@ -4230,6 +4237,7 @@ body.view-admin .admin-detail-only { display: block !important; }
 
           <div id="recordsStatus" class="admin-status" aria-live="polite"></div>
           <div id="recordsList" class="history-list"></div>
+          <button id="recordsLoadMore" class="admin-secondary records-load-more" type="button" hidden>Cargar más</button>
         </div>
 
         <div id="mechanicPanel" class="mechanic-panel" hidden>
@@ -4612,6 +4620,8 @@ const categories = [
     items: [
       { id: 'limpieza', name: 'Kit de Limpieza', price: 550, cost: 150 },
       { id: 'reparacion', name: 'Kit de Reparación', price: 750, cost: 250 },
+      { id: 'servicio-limpieza', name: 'Servicio Limpieza', price: 1000, cost: 0 },
+      { id: 'servicio-reparacion', name: 'Servicio Reparación', price: 1000, cost: 0 },
     ],
   },
   {
@@ -5474,7 +5484,7 @@ clearDiscountBtn.addEventListener('click', () => {
   render();
 });
 
-clearAllBtn.addEventListener('click', () => {
+function resetCalculator() {
   Object.keys(state.manualQty).forEach(id => state.manualQty[id] = 0);
   state.packageStack = [];
   state.discount = 0;
@@ -5482,7 +5492,9 @@ clearAllBtn.addEventListener('click', () => {
   syncDiscountModeUI();
   renderDiscountButtons();
   render();
-});
+}
+
+clearAllBtn.addEventListener('click', resetCalculator);
 
 copyTotalBtn.addEventListener('click', async () => {
   const { total } = calculate();
@@ -5570,6 +5582,7 @@ window.stopCarAdminAPI = {
   categories,
   packageNames: Object.keys(packagePrices),
   getSaleDraft,
+  resetCalculator,
 };
 
 
@@ -5738,6 +5751,7 @@ const recordsCost = document.querySelector('#recordsCost');
 const recordsProfit = document.querySelector('#recordsProfit');
 const recordsStatus = document.querySelector('#recordsStatus');
 const recordsList = document.querySelector('#recordsList');
+const recordsLoadMore = document.querySelector('#recordsLoadMore');
 const payrollPosition = document.querySelector('#payrollPosition');
 const payrollMechanicRole = document.querySelector('#payrollMechanicRole');
 const historyTitle = document.querySelector('#historyTitle');
@@ -5815,6 +5829,7 @@ let unsubscribeCurrentUserProfile = null;
 let unsubscribePayroll = null;
 let mechanicProfiles = [];
 let loadedSales = [];
+let recordsVisibleCount = 5;
 let selectedHistoryUserId = null;
 let selectedHistoryUserName = '';
 let historyContext = 'self';
@@ -6319,6 +6334,22 @@ async function bootstrapFirebaseConfigIfAdmin() {
           { merge: true }
         )
       );
+    } else {
+      const priceData = priceSnap.data() || {};
+      const currentServices = priceData.services || {};
+      const missingServiceDefaults = {};
+      if (!currentServices['servicio-limpieza']) {
+        missingServiceDefaults['servicio-limpieza'] = { sale: 1000, cost: 0 };
+      }
+      if (!currentServices['servicio-reparacion']) {
+        missingServiceDefaults['servicio-reparacion'] = { sale: 1000, cost: 0 };
+      }
+      if (Object.keys(missingServiceDefaults).length) {
+        writes.push(setDoc(pricesRef, {
+          services: { ...currentServices, ...missingServiceDefaults },
+          updatedAt: serverTimestamp(),
+        }, { merge: true }));
+      }
     }
 
     if (!positionSnap.exists()) {
@@ -6870,8 +6901,10 @@ function setAccountView(view) {
 
   if (view === 'records' && hasPermission('records')) {
     adminRecordsPanel.hidden = false;
-    setAdminHeader('Registros', 'Todas las ventas del taller');
+    setAdminHeader('Registros', 'Ventas registradas hoy');
     selectedRecordsWeekKey = currentWeekKey();
+    recordsVisibleCount = 5;
+    recordsSearch.value = '';
     showVoidedRecords.checked = false;
     refreshAdminRecordsView();
     refreshVoidCodePanel();
@@ -7457,9 +7490,12 @@ saleSave.addEventListener('click', async () => {
     await addDoc(collection(db, 'sales'), payload);
     setStatus(saleStatus, 'Venta registrada correctamente.', 'ok');
 
+    // La venta ya quedó guardada: dejamos la calculadora lista para el siguiente cliente.
+    window.stopCarAdminAPI?.resetCalculator?.();
+    pendingSaleDraft = null;
+
     setTimeout(() => {
       openSaleOverlay(false);
-      Object.keys(window.stopCarAdminAPI?.getSaleDraft?.().services || {}).length;
     }, 900);
   } catch (error) {
     console.error(error);
@@ -7878,73 +7914,67 @@ function refreshHistoryView() {
 historySearch.addEventListener('input', refreshHistoryView);
 
 
-function renderRecordsWeekTabs() {
-  const activeSales = loadedSales.filter(sale => sale.status !== 'void');
-  const keys = availableWeekKeys(activeSales);
-
-  if (!selectedRecordsWeekKey || !keys.includes(selectedRecordsWeekKey)) {
-    selectedRecordsWeekKey = currentWeekKey();
-  }
-
-  recordsWeekTabs.innerHTML = '';
-  keys.forEach(key => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'history-week-btn';
-    btn.classList.toggle('is-active', key === selectedRecordsWeekKey);
-    btn.textContent = key === currentWeekKey()
-      ? `Actual · ${formatWeekRange(key)}`
-      : formatWeekRange(key);
-
-    btn.addEventListener('click', () => {
-      selectedRecordsWeekKey = key;
-      refreshAdminRecordsView();
-    });
-
-    recordsWeekTabs.appendChild(btn);
-  });
+function isSaleToday(sale, now = new Date()) {
+  const date = saleDateObject(sale);
+  return date.getFullYear() === now.getFullYear()
+    && date.getMonth() === now.getMonth()
+    && date.getDate() === now.getDate();
 }
 
 function refreshAdminRecordsView() {
   if (!adminRecordsPanel || adminRecordsPanel.hidden) return;
 
-  renderRecordsWeekTabs();
-
   const queryText = recordsSearch.value.trim().toLowerCase();
   const includeVoided = Boolean(showVoidedRecords?.checked);
-  const weekMatches = loadedSales
-    .filter(sale => saleWeekKey(sale) === selectedRecordsWeekKey)
+  const today = new Date();
+
+  const todayMatches = loadedSales
+    .filter(sale => isSaleToday(sale, today))
     .filter(sale => !queryText || searchableSaleText(sale).includes(queryText));
 
-  const sales = weekMatches
+  const allMatchingSales = todayMatches
     .filter(sale => includeVoided || sale.status !== 'void')
     .sort((a, b) => saleDateObject(b) - saleDateObject(a));
-  const activeSales = weekMatches.filter(sale => sale.status !== 'void');
-  const voidedCount = weekMatches.filter(sale => sale.status === 'void').length;
 
-  recordsWeekLabel.textContent = selectedRecordsWeekKey === currentWeekKey()
-    ? `Semana actual · ${formatWeekRange(selectedRecordsWeekKey)}`
-    : `Semana cerrada · ${formatWeekRange(selectedRecordsWeekKey)}`;
+  const visibleSales = allMatchingSales.slice(0, recordsVisibleCount);
+  const activeSales = todayMatches.filter(sale => sale.status !== 'void');
+  const voidedCount = todayMatches.filter(sale => sale.status === 'void').length;
+
+  recordsWeekLabel.textContent = `Hoy · ${today.toLocaleDateString('es-MX', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })}`;
 
   recordsCount.textContent = String(activeSales.length);
   recordsTotal.textContent = formatMoney(activeSales.reduce((s, sale) => s + (Number(sale.total) || 0), 0));
   recordsCost.textContent = formatMoney(activeSales.reduce((s, sale) => s + (Number(sale.costTotal) || 0), 0));
   recordsProfit.textContent = formatMoney(activeSales.reduce((s, sale) => s + (Number(sale.profit) || 0), 0));
-  setStatus(recordsStatus, includeVoided && voidedCount ? `Mostrando también ${voidedCount} venta${voidedCount === 1 ? '' : 's'} anulada${voidedCount === 1 ? '' : 's'}.` : '');
+
+  const remaining = Math.max(0, allMatchingSales.length - visibleSales.length);
+  const statusParts = [];
+  if (includeVoided && voidedCount) {
+    statusParts.push(`Mostrando también ${voidedCount} venta${voidedCount === 1 ? '' : 's'} anulada${voidedCount === 1 ? '' : 's'}.`);
+  }
+  if (allMatchingSales.length > 5) {
+    statusParts.push(`Mostrando ${visibleSales.length} de ${allMatchingSales.length} registros de hoy.`);
+  }
+  setStatus(recordsStatus, statusParts.join(' '));
 
   recordsList.innerHTML = '';
 
-  if (!sales.length) {
+  if (!visibleSales.length) {
     const empty = document.createElement('div');
     empty.className = 'history-empty';
     empty.textContent = queryText
-      ? 'No encontré registros con esa búsqueda.'
-      : 'No hay ventas registradas en esta semana.';
+      ? 'No encontré registros de hoy con esa búsqueda.'
+      : 'No hay ventas registradas hoy.';
     recordsList.appendChild(empty);
+    recordsLoadMore.hidden = true;
     return;
   }
 
-  sales.forEach(sale => {
+  visibleSales.forEach(sale => {
     const item = document.createElement('button');
     item.type = 'button';
     item.className = 'history-item';
@@ -7987,10 +8017,25 @@ function refreshAdminRecordsView() {
     item.append(main, totalWrap);
     recordsList.appendChild(item);
   });
+
+  recordsLoadMore.hidden = remaining <= 0;
+  if (remaining > 0) {
+    recordsLoadMore.textContent = `Cargar más (${remaining})`;
+  }
 }
 
-recordsSearch.addEventListener('input', refreshAdminRecordsView);
-showVoidedRecords.addEventListener('change', refreshAdminRecordsView);
+recordsSearch.addEventListener('input', () => {
+  recordsVisibleCount = 5;
+  refreshAdminRecordsView();
+});
+showVoidedRecords.addEventListener('change', () => {
+  recordsVisibleCount = 5;
+  refreshAdminRecordsView();
+});
+recordsLoadMore.addEventListener('click', () => {
+  recordsVisibleCount += 10;
+  refreshAdminRecordsView();
+});
 
 
 function canAssignPosition(positionId) {
