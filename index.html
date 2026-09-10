@@ -8017,6 +8017,8 @@ function refreshAdminRecordsView() {
   const selectedDate = selectedRecordsDateObject();
   const startMinutes = selectedRecordsStartMinutes();
 
+  // REGISTROS incluye ventas de todos los usuarios con acceso: también las creadas por Administrador.
+  // No filtramos por role/positionId; únicamente por fecha, hora y búsqueda.
   const periodMatches = loadedSales
     .filter(sale => isSaleInSelectedRecordsPeriod(sale, selectedDate, startMinutes))
     .filter(sale => !queryText || searchableSaleText(sale).includes(queryText));
@@ -8091,8 +8093,10 @@ function refreshAdminRecordsView() {
 
     const meta = document.createElement('div');
     meta.className = 'history-item-meta';
+    const saleRoleLabel = String(sale.role || '').toLowerCase() === 'admin' ? 'Administrador' : '';
     meta.textContent = [
       sale.userName || sale.userEmail || 'Usuario',
+      saleRoleLabel,
       sale.date || '',
       sale.time || '',
     ].filter(Boolean).join(' · ');
