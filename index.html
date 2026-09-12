@@ -1952,85 +1952,12 @@ body.view-admin #costTotal { color: #c6ced3; }
   background: rgba(22,83,39,.12);
 }
 .workshop-week-stat.is-profit strong { color: #48de6b; }
-.workshop-week-breakdown {
-  margin-top: 11px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(105,121,128,.17);
-}
-.workshop-week-breakdown-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 6px;
-  color: #78858c;
-  font-size: 7px;
-  font-weight: 950;
-  letter-spacing: .55px;
-  text-transform: uppercase;
-}
-.workshop-week-breakdown-list {
-  display: grid;
-  gap: 5px;
-}
-.workshop-week-person {
-  display: grid;
-  grid-template-columns: minmax(0,1fr) auto auto;
-  gap: 12px;
-  align-items: center;
-  padding: 8px 9px;
-  border: 1px solid rgba(47,59,65,.72);
-  border-radius: 7px;
-  background: rgba(5,9,11,.52);
-}
-.workshop-week-person-name {
-  min-width: 0;
-}
-.workshop-week-person-name strong {
-  display: block;
-  overflow: hidden;
-  color: #e7ece9;
-  font-size: 9px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.workshop-week-person-name small {
-  display: block;
-  margin-top: 2px;
-  color: #6e7c83;
-  font-size: 7px;
-}
-.workshop-week-person-metric {
-  min-width: 78px;
-  text-align: right;
-}
-.workshop-week-person-metric span {
-  display: block;
-  color: #66747b;
-  font-size: 6px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-.workshop-week-person-metric strong {
-  display: block;
-  margin-top: 2px;
-  color: #dce3df;
-  font-size: 9px;
-}
-.workshop-week-empty {
-  padding: 10px 4px 2px;
-  color: #718087;
-  font-size: 8px;
-  text-align: center;
-}
 @media (max-width: 760px) {
   .workshop-week-summary-head { grid-template-columns: 1fr; align-items: stretch; }
   .workshop-week-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 520px) {
   .workshop-week-stats { grid-template-columns: 1fr 1fr; }
-  .workshop-week-person { grid-template-columns: minmax(0,1fr) auto; }
-  .workshop-week-person-metric.is-profit { display: none; }
 }
 .records-void-toggle {
   display: inline-flex;
@@ -4510,14 +4437,6 @@ body.view-admin .admin-detail-only { display: block !important; }
               <div class="workshop-week-stat"><span>Costo</span><strong id="workshopWeekCost">$0</strong></div>
               <div class="workshop-week-stat is-profit"><span>Ganancia</span><strong id="workshopWeekProfit">$0</strong></div>
             </div>
-
-            <div class="workshop-week-breakdown">
-              <div class="workshop-week-breakdown-head">
-                <span>Generado por empleado</span>
-                <span id="workshopWeekVoided"></span>
-              </div>
-              <div id="workshopWeekBreakdown" class="workshop-week-breakdown-list"></div>
-            </div>
           </section>
 
           <div class="mechanic-team-toolbar">
@@ -6005,8 +5924,6 @@ const workshopWeekCount = document.querySelector('#workshopWeekCount');
 const workshopWeekTotal = document.querySelector('#workshopWeekTotal');
 const workshopWeekCost = document.querySelector('#workshopWeekCost');
 const workshopWeekProfit = document.querySelector('#workshopWeekProfit');
-const workshopWeekVoided = document.querySelector('#workshopWeekVoided');
-const workshopWeekBreakdown = document.querySelector('#workshopWeekBreakdown');
 const recordsDate = document.querySelector('#recordsDate');
 const recordsStartTime = document.querySelector('#recordsStartTime');
 const showVoidedRecords = document.querySelector('#showVoidedRecords');
@@ -8200,15 +8117,8 @@ function refreshHistoryView() {
 historySearch.addEventListener('input', refreshHistoryView);
 
 
-function workshopEmployeeLabel(sale) {
-  if (String(sale?.role || '').toLowerCase() === 'admin') return 'Administrador';
-  const profile = mechanicProfiles.find(item => item.uid === sale?.userId);
-  if (profile) return positionLabelFromProfile(profile);
-  return 'Personal';
-}
-
 function refreshWorkshopWeeklySummary() {
-  if (!recordsSummaryWeekSelect || !workshopWeekBreakdown) return;
+  if (!recordsSummaryWeekSelect) return;
 
   const keys = availableWeekKeys(loadedSales);
   if (!selectedRecordsWeekKey || !keys.includes(selectedRecordsWeekKey)) {
@@ -8235,7 +8145,6 @@ function refreshWorkshopWeeklySummary() {
 
   const weekAllSales = loadedSales.filter(sale => saleWeekKey(sale) === selectedRecordsWeekKey);
   const activeSales = weekAllSales.filter(sale => sale.status !== 'void');
-  const voidedSales = weekAllSales.filter(sale => sale.status === 'void');
 
   const total = activeSales.reduce((sum, sale) => sum + (Number(sale.total) || 0), 0);
   const cost = activeSales.reduce((sum, sale) => sum + (Number(sale.costTotal) || 0), 0);
@@ -8248,62 +8157,6 @@ function refreshWorkshopWeeklySummary() {
   workshopWeekTotal.textContent = formatMoney(total);
   workshopWeekCost.textContent = formatMoney(cost);
   workshopWeekProfit.textContent = formatMoney(profit);
-  workshopWeekVoided.textContent = voidedSales.length
-    ? `${voidedSales.length} anulada${voidedSales.length === 1 ? '' : 's'} fuera del total`
-    : '';
-
-  const grouped = new Map();
-  activeSales.forEach(sale => {
-    const key = sale.userId || sale.userEmail || sale.userName || 'unknown';
-    if (!grouped.has(key)) {
-      grouped.set(key, {
-        name: sale.userName || sale.userEmail || 'Usuario',
-        roleLabel: workshopEmployeeLabel(sale),
-        count: 0,
-        total: 0,
-        profit: 0,
-      });
-    }
-    const row = grouped.get(key);
-    row.count += 1;
-    row.total += Number(sale.total) || 0;
-    row.profit += Number(sale.profit) || 0;
-  });
-
-  const people = [...grouped.values()].sort((a, b) => b.total - a.total);
-  workshopWeekBreakdown.innerHTML = '';
-
-  if (!people.length) {
-    const empty = document.createElement('div');
-    empty.className = 'workshop-week-empty';
-    empty.textContent = 'Todavía no hay ventas activas registradas en esta semana.';
-    workshopWeekBreakdown.appendChild(empty);
-    return;
-  }
-
-  people.forEach(person => {
-    const row = document.createElement('div');
-    row.className = 'workshop-week-person';
-
-    const nameWrap = document.createElement('div');
-    nameWrap.className = 'workshop-week-person-name';
-    const name = document.createElement('strong');
-    name.textContent = person.name;
-    const meta = document.createElement('small');
-    meta.textContent = `${person.roleLabel} · ${person.count} venta${person.count === 1 ? '' : 's'}`;
-    nameWrap.append(name, meta);
-
-    const sold = document.createElement('div');
-    sold.className = 'workshop-week-person-metric';
-    sold.innerHTML = `<span>Vendido</span><strong>${formatMoney(person.total)}</strong>`;
-
-    const gained = document.createElement('div');
-    gained.className = 'workshop-week-person-metric is-profit';
-    gained.innerHTML = `<span>Ganancia</span><strong>${formatMoney(person.profit)}</strong>`;
-
-    row.append(nameWrap, sold, gained);
-    workshopWeekBreakdown.appendChild(row);
-  });
 }
 
 function selectedRecordsDateObject() {
