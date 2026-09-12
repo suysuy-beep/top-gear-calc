@@ -4407,34 +4407,6 @@ body.view-admin .admin-detail-only { display: block !important; }
             <button id="recordsBack" class="admin-secondary" type="button">Mi cuenta</button>
           </div>
 
-          <section class="workshop-week-summary" aria-labelledby="workshopWeekSummaryTitle">
-            <div class="workshop-week-summary-head">
-              <div>
-                <div id="workshopWeekSummaryTitle" class="workshop-week-summary-title">Resumen semanal del taller</div>
-                <div id="workshopWeekSummaryLabel" class="workshop-week-summary-copy">Domingo 00:00 a sábado 23:59</div>
-              </div>
-              <label class="workshop-week-select">
-                <span>Semana</span>
-                <select id="recordsSummaryWeekSelect" aria-label="Semana del resumen del taller"></select>
-              </label>
-            </div>
-
-            <div class="workshop-week-stats">
-              <div class="workshop-week-stat"><span>Ventas</span><strong id="workshopWeekCount">0</strong></div>
-              <div class="workshop-week-stat"><span>Total generado</span><strong id="workshopWeekTotal">$0</strong></div>
-              <div class="workshop-week-stat"><span>Costo</span><strong id="workshopWeekCost">$0</strong></div>
-              <div class="workshop-week-stat is-profit"><span>Ganancia</span><strong id="workshopWeekProfit">$0</strong></div>
-            </div>
-
-            <div class="workshop-week-breakdown">
-              <div class="workshop-week-breakdown-head">
-                <span>Generado por empleado</span>
-                <span id="workshopWeekVoided"></span>
-              </div>
-              <div id="workshopWeekBreakdown" class="workshop-week-breakdown-list"></div>
-            </div>
-          </section>
-
           <div class="history-tools">
             <label class="history-search-wrap">
               <span class="history-search-icon">⌕</span>
@@ -4519,6 +4491,34 @@ body.view-admin .admin-detail-only { display: block !important; }
             </div>
             <button id="mechanicsBack" class="admin-secondary" type="button">Mi cuenta</button>
           </div>
+
+          <section class="workshop-week-summary" aria-labelledby="workshopWeekSummaryTitle">
+            <div class="workshop-week-summary-head">
+              <div>
+                <div id="workshopWeekSummaryTitle" class="workshop-week-summary-title">Resumen semanal del taller</div>
+                <div id="workshopWeekSummaryLabel" class="workshop-week-summary-copy">Domingo 00:00 a sábado 23:59</div>
+              </div>
+              <label class="workshop-week-select">
+                <span>Semana</span>
+                <select id="recordsSummaryWeekSelect" aria-label="Semana del resumen del taller"></select>
+              </label>
+            </div>
+
+            <div class="workshop-week-stats">
+              <div class="workshop-week-stat"><span>Ventas</span><strong id="workshopWeekCount">0</strong></div>
+              <div class="workshop-week-stat"><span>Total generado</span><strong id="workshopWeekTotal">$0</strong></div>
+              <div class="workshop-week-stat"><span>Costo</span><strong id="workshopWeekCost">$0</strong></div>
+              <div class="workshop-week-stat is-profit"><span>Ganancia</span><strong id="workshopWeekProfit">$0</strong></div>
+            </div>
+
+            <div class="workshop-week-breakdown">
+              <div class="workshop-week-breakdown-head">
+                <span>Generado por empleado</span>
+                <span id="workshopWeekVoided"></span>
+              </div>
+              <div id="workshopWeekBreakdown" class="workshop-week-breakdown-list"></div>
+            </div>
+          </section>
 
           <div class="mechanic-team-toolbar">
             <label class="history-search-wrap">
@@ -7182,7 +7182,7 @@ function setAccountView(view) {
 
   if (view === 'records' && hasPermission('records')) {
     adminRecordsPanel.hidden = false;
-    setAdminHeader('Registros', 'Resumen semanal y consulta por fecha y hora');
+    setAdminHeader('Registros', 'Consulta por fecha y hora');
     selectedRecordsWeekKey = currentWeekKey();
     recordsVisibleCount = 5;
     recordsSearch.value = '';
@@ -7216,6 +7216,8 @@ function setAccountView(view) {
       selectedHistoryUserName = '';
       selectedMechanicProfile = null;
       setMechanicCreateOpen(false);
+      selectedRecordsWeekKey = selectedRecordsWeekKey || currentWeekKey();
+      refreshWorkshopWeeklySummary();
       renderMechanicDirectory();
     } else {
       setAccountView('my-history');
@@ -9019,6 +9021,7 @@ function subscribeToSales(user) {
       setStatus(historyStatus, '');
       renderMechanicDirectory();
       refreshHistoryView();
+      refreshWorkshopWeeklySummary();
       refreshAdminRecordsView();
     },
     error => {
