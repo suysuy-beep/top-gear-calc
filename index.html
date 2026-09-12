@@ -1855,6 +1855,182 @@ body.view-admin #costTotal { color: #c6ced3; }
 @media (max-width: 620px) {
   .records-period-grid { grid-template-columns: 1fr; }
 }
+
+/* Resumen semanal de todo el taller */
+.workshop-week-summary {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 1px solid rgba(63,211,90,.22);
+  border-radius: 11px;
+  background:
+    linear-gradient(145deg, rgba(31,108,54,.10), rgba(7,12,15,.92) 42%),
+    #090e11;
+  box-shadow: inset 0 0 0 1px rgba(63,211,90,.025);
+}
+.workshop-week-summary-head {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(210px,300px);
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+.workshop-week-summary-title {
+  color: #edf3ef;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+}
+.workshop-week-summary-copy {
+  margin-top: 4px;
+  color: #718087;
+  font-size: 8px;
+  line-height: 1.45;
+}
+.workshop-week-select {
+  display: grid;
+  gap: 5px;
+}
+.workshop-week-select > span {
+  color: #718087;
+  font-size: 7px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .65px;
+}
+.workshop-week-select select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #2d383f;
+  border-radius: 8px;
+  background: #080d10;
+  color: #edf3ef;
+  color-scheme: dark;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  outline: none;
+}
+.workshop-week-select select:focus {
+  border-color: rgba(63,211,90,.65);
+  box-shadow: 0 0 0 2px rgba(63,211,90,.07);
+}
+.workshop-week-stats {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 8px;
+}
+.workshop-week-stat {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid #29343a;
+  border-radius: 9px;
+  background: rgba(6,11,14,.80);
+}
+.workshop-week-stat span {
+  display: block;
+  margin-bottom: 5px;
+  color: #78858c;
+  font-size: 7px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .55px;
+}
+.workshop-week-stat strong {
+  display: block;
+  overflow: hidden;
+  color: #f2f5f3;
+  font-size: 16px;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workshop-week-stat.is-profit {
+  border-color: rgba(63,211,90,.40);
+  background: rgba(22,83,39,.12);
+}
+.workshop-week-stat.is-profit strong { color: #48de6b; }
+.workshop-week-breakdown {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(105,121,128,.17);
+}
+.workshop-week-breakdown-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+  color: #78858c;
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: .55px;
+  text-transform: uppercase;
+}
+.workshop-week-breakdown-list {
+  display: grid;
+  gap: 5px;
+}
+.workshop-week-person {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 9px;
+  border: 1px solid rgba(47,59,65,.72);
+  border-radius: 7px;
+  background: rgba(5,9,11,.52);
+}
+.workshop-week-person-name {
+  min-width: 0;
+}
+.workshop-week-person-name strong {
+  display: block;
+  overflow: hidden;
+  color: #e7ece9;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workshop-week-person-name small {
+  display: block;
+  margin-top: 2px;
+  color: #6e7c83;
+  font-size: 7px;
+}
+.workshop-week-person-metric {
+  min-width: 78px;
+  text-align: right;
+}
+.workshop-week-person-metric span {
+  display: block;
+  color: #66747b;
+  font-size: 6px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.workshop-week-person-metric strong {
+  display: block;
+  margin-top: 2px;
+  color: #dce3df;
+  font-size: 9px;
+}
+.workshop-week-empty {
+  padding: 10px 4px 2px;
+  color: #718087;
+  font-size: 8px;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .workshop-week-summary-head { grid-template-columns: 1fr; align-items: stretch; }
+  .workshop-week-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 520px) {
+  .workshop-week-stats { grid-template-columns: 1fr 1fr; }
+  .workshop-week-person { grid-template-columns: minmax(0,1fr) auto; }
+  .workshop-week-person-metric.is-profit { display: none; }
+}
 .records-void-toggle {
   display: inline-flex;
   align-items: center;
@@ -4230,6 +4406,34 @@ body.view-admin .admin-detail-only { display: block !important; }
             <button id="recordsBack" class="admin-secondary" type="button">Mi cuenta</button>
           </div>
 
+          <section class="workshop-week-summary" aria-labelledby="workshopWeekSummaryTitle">
+            <div class="workshop-week-summary-head">
+              <div>
+                <div id="workshopWeekSummaryTitle" class="workshop-week-summary-title">Resumen semanal del taller</div>
+                <div id="workshopWeekSummaryLabel" class="workshop-week-summary-copy">Domingo 00:00 a sábado 23:59</div>
+              </div>
+              <label class="workshop-week-select">
+                <span>Semana</span>
+                <select id="recordsSummaryWeekSelect" aria-label="Semana del resumen del taller"></select>
+              </label>
+            </div>
+
+            <div class="workshop-week-stats">
+              <div class="workshop-week-stat"><span>Ventas</span><strong id="workshopWeekCount">0</strong></div>
+              <div class="workshop-week-stat"><span>Total generado</span><strong id="workshopWeekTotal">$0</strong></div>
+              <div class="workshop-week-stat"><span>Costo</span><strong id="workshopWeekCost">$0</strong></div>
+              <div class="workshop-week-stat is-profit"><span>Ganancia</span><strong id="workshopWeekProfit">$0</strong></div>
+            </div>
+
+            <div class="workshop-week-breakdown">
+              <div class="workshop-week-breakdown-head">
+                <span>Generado por empleado</span>
+                <span id="workshopWeekVoided"></span>
+              </div>
+              <div id="workshopWeekBreakdown" class="workshop-week-breakdown-list"></div>
+            </div>
+          </section>
+
           <div class="history-tools">
             <label class="history-search-wrap">
               <span class="history-search-icon">⌕</span>
@@ -5794,6 +5998,14 @@ const voidCodeMeta = document.querySelector('#voidCodeMeta');
 const generateVoidCodeBtn = document.querySelector('#generateVoidCodeBtn');
 const copyVoidCodeBtn = document.querySelector('#copyVoidCodeBtn');
 const recordsSearch = document.querySelector('#recordsSearch');
+const recordsSummaryWeekSelect = document.querySelector('#recordsSummaryWeekSelect');
+const workshopWeekSummaryLabel = document.querySelector('#workshopWeekSummaryLabel');
+const workshopWeekCount = document.querySelector('#workshopWeekCount');
+const workshopWeekTotal = document.querySelector('#workshopWeekTotal');
+const workshopWeekCost = document.querySelector('#workshopWeekCost');
+const workshopWeekProfit = document.querySelector('#workshopWeekProfit');
+const workshopWeekVoided = document.querySelector('#workshopWeekVoided');
+const workshopWeekBreakdown = document.querySelector('#workshopWeekBreakdown');
 const recordsDate = document.querySelector('#recordsDate');
 const recordsStartTime = document.querySelector('#recordsStartTime');
 const showVoidedRecords = document.querySelector('#showVoidedRecords');
@@ -6969,7 +7181,7 @@ function setAccountView(view) {
 
   if (view === 'records' && hasPermission('records')) {
     adminRecordsPanel.hidden = false;
-    setAdminHeader('Registros', 'Consulta ventas por fecha y hora');
+    setAdminHeader('Registros', 'Resumen semanal y consulta por fecha y hora');
     selectedRecordsWeekKey = currentWeekKey();
     recordsVisibleCount = 5;
     recordsSearch.value = '';
@@ -7985,6 +8197,112 @@ function refreshHistoryView() {
 historySearch.addEventListener('input', refreshHistoryView);
 
 
+function workshopEmployeeLabel(sale) {
+  if (String(sale?.role || '').toLowerCase() === 'admin') return 'Administrador';
+  const profile = mechanicProfiles.find(item => item.uid === sale?.userId);
+  if (profile) return positionLabelFromProfile(profile);
+  return 'Personal';
+}
+
+function refreshWorkshopWeeklySummary() {
+  if (!recordsSummaryWeekSelect || !workshopWeekBreakdown) return;
+
+  const keys = availableWeekKeys(loadedSales);
+  if (!selectedRecordsWeekKey || !keys.includes(selectedRecordsWeekKey)) {
+    selectedRecordsWeekKey = currentWeekKey();
+  }
+
+  const previousValue = recordsSummaryWeekSelect.value;
+  recordsSummaryWeekSelect.innerHTML = '';
+  keys.forEach(key => {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = key === currentWeekKey()
+      ? `Actual · ${formatWeekRange(key)}`
+      : formatWeekRange(key);
+    recordsSummaryWeekSelect.appendChild(option);
+  });
+
+  if (keys.includes(selectedRecordsWeekKey)) {
+    recordsSummaryWeekSelect.value = selectedRecordsWeekKey;
+  } else if (keys.includes(previousValue)) {
+    selectedRecordsWeekKey = previousValue;
+    recordsSummaryWeekSelect.value = previousValue;
+  }
+
+  const weekAllSales = loadedSales.filter(sale => saleWeekKey(sale) === selectedRecordsWeekKey);
+  const activeSales = weekAllSales.filter(sale => sale.status !== 'void');
+  const voidedSales = weekAllSales.filter(sale => sale.status === 'void');
+
+  const total = activeSales.reduce((sum, sale) => sum + (Number(sale.total) || 0), 0);
+  const cost = activeSales.reduce((sum, sale) => sum + (Number(sale.costTotal) || 0), 0);
+  const profit = activeSales.reduce((sum, sale) => sum + (Number(sale.profit) || 0), 0);
+
+  workshopWeekSummaryLabel.textContent = selectedRecordsWeekKey === currentWeekKey()
+    ? `Semana actual · domingo 00:00 a sábado 23:59 · ${formatWeekRange(selectedRecordsWeekKey)}`
+    : `Semana cerrada · ${formatWeekRange(selectedRecordsWeekKey)}`;
+  workshopWeekCount.textContent = String(activeSales.length);
+  workshopWeekTotal.textContent = formatMoney(total);
+  workshopWeekCost.textContent = formatMoney(cost);
+  workshopWeekProfit.textContent = formatMoney(profit);
+  workshopWeekVoided.textContent = voidedSales.length
+    ? `${voidedSales.length} anulada${voidedSales.length === 1 ? '' : 's'} fuera del total`
+    : '';
+
+  const grouped = new Map();
+  activeSales.forEach(sale => {
+    const key = sale.userId || sale.userEmail || sale.userName || 'unknown';
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        name: sale.userName || sale.userEmail || 'Usuario',
+        roleLabel: workshopEmployeeLabel(sale),
+        count: 0,
+        total: 0,
+        profit: 0,
+      });
+    }
+    const row = grouped.get(key);
+    row.count += 1;
+    row.total += Number(sale.total) || 0;
+    row.profit += Number(sale.profit) || 0;
+  });
+
+  const people = [...grouped.values()].sort((a, b) => b.total - a.total);
+  workshopWeekBreakdown.innerHTML = '';
+
+  if (!people.length) {
+    const empty = document.createElement('div');
+    empty.className = 'workshop-week-empty';
+    empty.textContent = 'Todavía no hay ventas activas registradas en esta semana.';
+    workshopWeekBreakdown.appendChild(empty);
+    return;
+  }
+
+  people.forEach(person => {
+    const row = document.createElement('div');
+    row.className = 'workshop-week-person';
+
+    const nameWrap = document.createElement('div');
+    nameWrap.className = 'workshop-week-person-name';
+    const name = document.createElement('strong');
+    name.textContent = person.name;
+    const meta = document.createElement('small');
+    meta.textContent = `${person.roleLabel} · ${person.count} venta${person.count === 1 ? '' : 's'}`;
+    nameWrap.append(name, meta);
+
+    const sold = document.createElement('div');
+    sold.className = 'workshop-week-person-metric';
+    sold.innerHTML = `<span>Vendido</span><strong>${formatMoney(person.total)}</strong>`;
+
+    const gained = document.createElement('div');
+    gained.className = 'workshop-week-person-metric is-profit';
+    gained.innerHTML = `<span>Ganancia</span><strong>${formatMoney(person.profit)}</strong>`;
+
+    row.append(nameWrap, sold, gained);
+    workshopWeekBreakdown.appendChild(row);
+  });
+}
+
 function selectedRecordsDateObject() {
   const raw = recordsDate?.value || dateKeyLocal(new Date());
   const match = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -8011,6 +8329,8 @@ function isSaleInSelectedRecordsPeriod(sale, selectedDate, startMinutes = 0) {
 
 function refreshAdminRecordsView() {
   if (!adminRecordsPanel || adminRecordsPanel.hidden) return;
+
+  refreshWorkshopWeeklySummary();
 
   const queryText = recordsSearch.value.trim().toLowerCase();
   const includeVoided = Boolean(showVoidedRecords?.checked);
@@ -8124,6 +8444,11 @@ function refreshAdminRecordsView() {
     recordsLoadMore.textContent = `Cargar más (${remaining})`;
   }
 }
+
+recordsSummaryWeekSelect.addEventListener('change', () => {
+  selectedRecordsWeekKey = recordsSummaryWeekSelect.value || currentWeekKey();
+  refreshWorkshopWeeklySummary();
+});
 
 recordsSearch.addEventListener('input', () => {
   recordsVisibleCount = 5;
