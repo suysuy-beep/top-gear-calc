@@ -547,10 +547,6 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 }
 
 
-
-/* ===============================
-   CUENTA / ADMINISTRADOR DE PRECIOS
-   =============================== */
 .admin-launcher {
   position: fixed;
   left: 14px;
@@ -755,7 +751,6 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 }
 
 
-/* ===== CARGA INICIAL DE PRECIOS REMOTOS ===== */
 body.prices-loading .app-shell,
 body.prices-loading .top-account-zone {
   opacity: 0;
@@ -807,7 +802,6 @@ body.prices-loading .price-boot {
 }
 
 
-/* ===== ACCESO OBLIGATORIO ===== */
 body.auth-locked .app-shell {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -832,7 +826,7 @@ body.auth-locked .admin-card {
   box-shadow: 0 30px 100px rgba(0,0,0,.72), 0 0 42px rgba(63,211,90,.06);
 }
 
-/* ===== TOP GEAR VISUAL THEME ===== */
+
 body {
   background:
     radial-gradient(circle at 12% 5%, rgba(63,211,90,.075), transparent 28%),
@@ -878,7 +872,6 @@ body {
 @media (max-width:700px) { .brand-logo { width: 92px; max-height: 92px; } .topbar { min-height: 108px; } }
 
 
-/* ===== LOGIN TOP GEAR / ROLES ===== */
 .account-role-badge {
   display: inline-flex;
   align-items: center;
@@ -1008,7 +1001,6 @@ body.session-active .admin-launcher {
 }
 
 
-/* ===== TOP GEAR: CUENTA EN HEADER ===== */
 .top-account-zone {
   justify-self: end;
   display: flex;
@@ -1077,10 +1069,10 @@ body.session-active .top-login-btn {
   color: #dffff0;
 }
 
-/* El viejo launcher flotante ya no se usa. */
+
 .admin-launcher { display: none !important; }
 
-/* ===== HISTORIAL ===== */
+
 .history-panel {
   display: grid;
   gap: 13px;
@@ -1164,7 +1156,7 @@ body.session-active .top-login-btn {
   font-variant-numeric: tabular-nums;
 }
 
-/* ===== REGISTRAR VENTA ===== */
+
 .sale-overlay {
   position: fixed;
   inset: 0;
@@ -1347,16 +1339,15 @@ body.session-active .top-login-btn {
 }
 
 
-/* ===== COSTOS / VISTA ADMIN ===== */
 .admin-catalog-only,
 .admin-summary-only,
 .admin-history-only { display: none !important; }
 
 body.view-admin .admin-catalog-only { display: block !important; }
 body.view-admin .admin-summary-only { display: flex !important; }
-/* Los datos financieros generales pertenecen a REGISTROS, no a "Mis ventas". */
+
 body.view-record-financials #adminRecordsPanel .admin-history-only { display: block !important; }
-/* En el historial de un empleado sí mostramos costo/ganancia; la nómina requiere permiso aparte. */
+
 body.history-team-context #historyPanel .admin-history-only:not(#payrollPanel) { display: block !important; }
 body.history-team-context.view-payroll #payrollPanel { display: block !important; }
 body.view-void-actions .sale-detail-admin-actions.admin-detail-only { display: flex !important; }
@@ -1441,7 +1432,6 @@ body.view-admin #costTotal { color: #c6ced3; }
 }
 
 
-/* ===== REGISTRO DE VENTA REFINADO ===== */
 .sale-actions-refined {
   grid-template-columns: auto minmax(190px, .95fr) !important;
   justify-content: end;
@@ -1494,7 +1484,7 @@ body.view-admin #costTotal { color: #c6ced3; }
 .sale-save-btn:hover { filter: brightness(1.06); }
 .sale-save-btn:disabled { opacity: .5; cursor: wait; }
 
-/* ===== BUSCADORES ===== */
+
 .history-tools { display: grid; gap: 8px; }
 .history-search-wrap {
   min-height: 42px;
@@ -1524,7 +1514,7 @@ body.view-admin #costTotal { color: #c6ced3; }
 }
 .history-search-wrap input::placeholder { color: #69757c; }
 
-/* ===== DIRECTORIO DE MECÁNICOS ===== */
+
 .mechanic-directory {
   display: grid;
   gap: 8px;
@@ -1605,7 +1595,7 @@ body.view-admin #costTotal { color: #c6ced3; }
   font-size: 11px;
 }
 
-/* ===== V17: ALTAS Y BAJAS DEL EQUIPO ===== */
+
 .mechanic-team-toolbar {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
@@ -1689,8 +1679,7 @@ body.view-admin #costTotal { color: #c6ced3; }
   margin-top: 2px;
 }
 
-/* Alta/edición de personal: usa todo el ancho del panel.
-   El editor de convenios tiene una columna reservada para logos; aquí no la necesitamos. */
+
 .mechanic-create-editor .agreement-editor-body,
 .mechanic-edit-editor .agreement-editor-body {
   display: block;
@@ -1703,7 +1692,7 @@ body.view-admin #costTotal { color: #c6ced3; }
   gap: 12px;
 }
 
-/* Alta: nombre compacto + correo amplio; segunda fila en tres columnas. */
+
 .mechanic-create-editor .mechanic-create-grid {
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
@@ -1713,7 +1702,7 @@ body.view-admin #costTotal { color: #c6ced3; }
 .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(4),
 .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(5) { grid-column: span 4; }
 
-/* Edición: dos columnas limpias. */
+
 .mechanic-edit-editor .mechanic-create-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1857,7 +1846,7 @@ body.view-admin #costTotal { color: #c6ced3; }
   .records-period-grid { grid-template-columns: 1fr; }
 }
 
-/* Resumen semanal de todo el taller */
+
 .workshop-week-summary {
   margin: 0 0 16px;
   padding: 14px;
@@ -1919,7 +1908,7 @@ body.view-admin #costTotal { color: #c6ced3; }
 }
 .workshop-week-stats {
   display: grid;
-  grid-template-columns: repeat(4,minmax(0,1fr));
+  grid-template-columns: repeat(5,minmax(0,1fr));
   gap: 8px;
 }
 .workshop-week-stat {
@@ -2042,7 +2031,7 @@ body.view-admin .sale-detail-admin-actions.admin-detail-only { display: flex !im
   }
 }
 
-/* ===== SEMANAS ===== */
+
 .history-week-caption {
   margin: 1px 0 7px;
   color: #7d898f;
@@ -2085,7 +2074,7 @@ body.view-admin .sale-detail-admin-actions.admin-detail-only { display: flex !im
   line-height: 1.4;
 }
 
-/* ===== HISTORIAL CLICKEABLE ===== */
+
 .history-item {
   width: 100%;
   appearance: none;
@@ -2118,7 +2107,7 @@ body.view-admin .sale-detail-admin-actions.admin-detail-only { display: flex !im
   font-size: 14px;
 }
 
-/* ===== DETALLE DE VENTA ===== */
+
 .admin-detail-only { display: none !important; }
 body.view-admin .admin-detail-only { display: block !important; }
 .sale-detail-card { width: min(570px, 96vw); }
@@ -2151,7 +2140,7 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 #detailTotal { color: var(--accent); }
 
-/* Admin abre directorio, no lista global de ventas. */
+
 #adminMechanicsPanel[hidden] { display: none !important; }
 
 @media (max-width: 640px) {
@@ -2169,7 +2158,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== ADMIN HOME ===== */
 .admin-home-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2225,7 +2213,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   line-height: 1.4;
 }
 
-/* ===== NÓMINA ===== */
+
 .history-stats {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -2365,7 +2353,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== CONVENIOS ===== */
 .agreements-open-btn {
   width: 100%;
   min-height: 54px;
@@ -2578,8 +2565,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-
-/* ===== DESCUENTOS MANUALES + CONVENIOS EXCLUSIVOS ===== */
 .manual-discount-area {
   position: relative;
 }
@@ -2620,7 +2605,7 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 .agreements-separator span { padding: 0 2px; }
 
-/* ===== CONVENIOS AGRUPADOS ===== */
+
 .agreements-groups {
   display: grid;
   gap: 14px;
@@ -2761,7 +2746,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== ADMINISTRADOR DE CONVENIOS ===== */
 .agreements-admin-panel {
   display: grid;
   gap: 13px;
@@ -2862,7 +2846,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   text-align: center;
 }
 
-/* Editor */
+
 .agreement-editor {
   margin-top: 2px;
   border: 1px solid rgba(63,211,90,.30);
@@ -2996,7 +2980,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== MENÚ DE CUENTA / HAMBURGUESA ===== */
 .account-menu-wrap {
   position: relative;
   display: flex;
@@ -3089,7 +3072,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== HEADER CENTRADO / REGRESO ===== */
 .admin-head{
   display:grid !important;
   grid-template-columns: 46px minmax(0,1fr) 46px;
@@ -3135,7 +3117,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== V10: HEADER ESTABLE ===== */
 .admin-head {
   display: grid !important;
   grid-template-columns: 42px minmax(0, 1fr) auto !important;
@@ -3213,7 +3194,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   background: rgba(63,211,90,.12);
 }
 
-/* IMPORTANT: hidden must always win over authored display styles */
+
 #adminBack[hidden],
 #teamPositionsBtn[hidden],
 .account-menu-dropdown[hidden],
@@ -3222,7 +3203,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   display: none !important;
 }
 
-/* ===== V10: NO RECORTAR TARJETAS AL HOVER ===== */
+
 .mechanic-directory-card:hover,
 .agreement-item:hover,
 .admin-home-card:hover,
@@ -3240,7 +3221,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   transform: none !important;
 }
 
-/* ===== V10: MENÚ HAMBURGUESA ===== */
+
 .account-menu-dropdown {
   width: 270px !important;
   padding: 9px !important;
@@ -3298,7 +3279,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   display: none !important;
 }
 
-/* ===== V10: EQUIPO ===== */
+
 .team-top-note {
   color: #7e8b92;
   font-size: 9px;
@@ -3316,7 +3297,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== V11: HEADER CENTRADO DE VERDAD ===== */
 .admin-card .admin-head {
   display: grid !important;
   grid-template-columns: minmax(92px,1fr) minmax(0,2fr) minmax(92px,1fr) !important;
@@ -3385,7 +3365,7 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 .records-load-more[hidden] { display: none !important; }
 
-/* Cuenta = una sola superficie, sin tarjeta dentro de tarjeta */
+
 .admin-card.is-account-session {
   width: min(1160px, 94vw);
   max-height: min(88vh, 760px);
@@ -3688,13 +3668,13 @@ body.view-admin .admin-detail-only { display: block !important; }
   }
 }
 
-/* El login siempre queda centrado dentro del modal */
+
 .admin-login {
   margin-left: auto !important;
   margin-right: auto !important;
 }
 
-/* Evitar cualquier tarjeta que se salga del scroll al hover */
+
 .mechanic-directory-card,
 .history-item,
 .agreement-item,
@@ -3712,7 +3692,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   transform: none !important;
 }
 
-/* Menú hamburger: separación visual limpia */
+
 .account-menu-dropdown {
   padding: 9px !important;
 }
@@ -3741,7 +3721,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-/* ===== V12: EL SALTITO REGRESA, SIN RECORTAR LA PRIMERA TARJETA ===== */
 .mechanic-directory,
 .history-list,
 .agreements-admin-list,
@@ -3771,7 +3750,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   transform: translateY(-1px) !important;
 }
 
-/* ===== NÓMINA MÁS LIMPIA ===== */
+
 .payroll-compact-grid {
   grid-template-columns: minmax(180px, 1fr) minmax(140px, 190px) !important;
   align-items: end;
@@ -3798,7 +3777,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   }
 }
 
-/* ===== NÓMINA DINÁMICA: HORAS + COMISIÓN ESCALONADA ===== */
+
 .position-pay-scheme-note {
   grid-column: 1 / -1;
   display: grid;
@@ -3849,8 +3828,6 @@ body.view-admin .admin-detail-only { display: block !important; }
 }
 
 
-
-/* ===== PERMISOS / CÓDIGO DIARIO DE ANULACIONES ===== */
 .void-code-panel {
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
@@ -3889,7 +3866,7 @@ body.view-admin .admin-detail-only { display: block !important; }
   .void-code-actions { justify-content: flex-start; flex-wrap: wrap; }
 }
 
-/* ===== V13: MENÚ MÁS LIMPIO ===== */
+
 .account-menu-dropdown button strong {
   text-transform: uppercase;
   letter-spacing: .45px;
@@ -3949,7 +3926,7 @@ body.view-admin .admin-detail-only { display: block !important; }
             </button>
           </div>
         </div>
-        
+
       </div>
     </header>
 
@@ -4228,7 +4205,6 @@ body.view-admin .admin-detail-only { display: block !important; }
         </div>
 
 
-
         <div id="adminPositionsPanel" class="agreements-admin-panel" hidden>
           <div class="history-head">
             <div>
@@ -4484,6 +4460,7 @@ body.view-admin .admin-detail-only { display: block !important; }
               <div class="workshop-week-stat"><span>Total generado</span><strong id="workshopWeekTotal">$0</strong></div>
               <div class="workshop-week-stat"><span>Costo</span><strong id="workshopWeekCost">$0</strong></div>
               <div class="workshop-week-stat is-profit"><span>Ganancia</span><strong id="workshopWeekProfit">$0</strong></div>
+              <div id="workshopWeekPayrollCard" class="workshop-week-stat"><span>Total pagado en nóminas</span><strong id="workshopWeekPayrollPaid">$0</strong></div>
             </div>
           </section>
 
@@ -4833,13 +4810,8 @@ const money = new Intl.NumberFormat('es-MX', {
   maximumFractionDigits: 0,
 });
 
-// Límites de seguridad / uso.
-// 99 mantiene la interfaz rápida y evita cantidades accidentales gigantes.
 const MAX_QTY = 99;
 
-// ===============================
-// EDITA AQUÍ TUS SERVICIOS/PRECIOS
-// ===============================
 const categories = [
   {
     name: 'Reparación',
@@ -4901,11 +4873,6 @@ const categories = [
   },
 ];
 
-// =========================================================
-// EDITA AQUÍ QUÉ INCLUYE CADA FULL TUNING.
-// Cada Full Tuning agrega 1 unidad de cada servicio incluido.
-// Puedes agregar varios paquetes y lo manual se guarda aparte.
-// =========================================================
 const packages = {
   i4: ['motor-i4', 'turbo', 'frenos', 'semi-slick', 'awd'],
   V6: ['motor-v6', 'turbo', 'frenos', 'semi-slick', 'awd'],
@@ -4913,15 +4880,13 @@ const packages = {
   V12: ['motor-v12', 'turbo', 'frenos', 'semi-slick', 'awd'],
 };
 
-// Precio de VENTA cerrado cuando compran todo junto.
 const packagePrices = {
   i4: 73200,
   V6: 83200,
-  V8: 95200,
+  V8: 88000,
   V12: 532700,
 };
 
-// COSTO interno del Full Tuning. Solo lo ve administración.
 const packageCosts = {
   i4: 35000,
   V6: 45000,
@@ -4934,8 +4899,6 @@ const discounts = [5, 10, 15];
 const flatItems = categories.flatMap(category => category.items);
 const itemById = Object.fromEntries(flatItems.map(item => [item.id, item]));
 
-// Estado separado: manual + una "pila" de Full Tunings.
-// Cada Full Tuning es una entrada independiente. Al quitar uno, solo desaparece ese paquete.
 const state = {
   manualQty: Object.fromEntries(flatItems.map(item => [item.id, 0])),
   packageStack: [],
@@ -5044,7 +5007,6 @@ function renderCatalog() {
       totalEl.textContent = money.format(0);
 
       minusBtn.addEventListener('click', () => {
-        // Solo quitamos unidades agregadas manualmente; las del Full Tuning se protegen.
         if (state.manualQty[item.id] <= 0) return;
         state.manualQty[item.id] -= 1;
         render();
@@ -5056,8 +5018,6 @@ function renderCatalog() {
         render();
       });
 
-      // El número visible es la cantidad TOTAL (manual + Full Tuning).
-      // Si escribes una cifra menor que lo aportado por Full Tuning, se conserva ese mínimo.
       const commitTypedQty = () => {
         const packageQty = packageQtyFor(item.id);
         const parsed = Number.parseInt(qtyEl.value, 10);
@@ -5157,7 +5117,6 @@ function applyAgreementConfig(config) {
   const normalized = normalizeAgreementConfig(config);
   agreementGroups.splice(0, agreementGroups.length, ...normalized);
 
-  // Si el convenio activo dejó de existir o fue desactivado, lo quitamos.
   const current = activeAgreement();
   if (!current || current.active === false) {
     activeAgreementId = null;
@@ -5223,7 +5182,6 @@ function makeAgreementLogo(item) {
 }
 
 function applyAgreement(item) {
-  // Los descuentos no se apilan: el convenio reemplaza cualquier descuento manual.
   activeAgreementId = item.id;
   state.discount = item.discount;
 
@@ -5333,7 +5291,6 @@ function renderDiscountButtons() {
     btn.addEventListener('click', () => {
       if (activeAgreement()) return;
 
-      // Un descuento manual siempre trabaja sin convenio.
       activeAgreementId = null;
       state.discount = state.discount === value ? 0 : value;
 
@@ -5378,7 +5335,6 @@ function renderPackageButtons() {
 }
 
 function calculate() {
-  // Venta manual + Full Tuning a precio cerrado.
   const manualSubtotal = flatItems.reduce((sum, item) => {
     return sum + state.manualQty[item.id] * item.price;
   }, 0);
@@ -5387,7 +5343,6 @@ function calculate() {
     return sum + (packagePrices[packageName] ?? 0);
   }, 0);
 
-  // El costo es información interna y no se muestra al mecánico.
   const manualCost = flatItems.reduce((sum, item) => {
     return sum + state.manualQty[item.id] * (item.cost ?? 0);
   }, 0);
@@ -5471,7 +5426,7 @@ function renderRows() {
     ref.totalEl.textContent = manual > 0
       ? money.format(manual * item.price)
       : (packageQty > 0 ? 'Incluido' : money.format(0));
-    ref.minusBtn.disabled = manual === 0; // no puede “quitar” una unidad que vino del paquete.
+    ref.minusBtn.disabled = manual === 0;
     ref.plusBtn.disabled = totalQty >= MAX_QTY;
 
     ref.nameEl.querySelector('.package-badge')?.remove();
@@ -5600,10 +5555,6 @@ function render() {
   renderDiscounts();
 }
 
-// ========================================
-// ACCESOS RÁPIDOS DE LOS BOTONES SUPERIORES
-// Aquí puedes cambiar qué aparece dentro de cada menú.
-// ========================================
 const quickMenus = {
   tuning: {
     label: 'Acceso rápido · Tuning',
@@ -5702,7 +5653,6 @@ quickTabs.forEach(tab => {
 closeQuickNavBtn.addEventListener('click', closeQuickMenu);
 
 removePackageBtn.addEventListener('click', () => {
-  // Solo quitamos un paquete real: el último que se agregó.
   if (state.packageStack.length === 0) return;
   state.packageStack.pop();
   render();
@@ -5731,9 +5681,6 @@ clearAllBtn.addEventListener('click', resetCalculator);
 copyTotalBtn.addEventListener('click', async () => {
   const { total } = calculate();
 
-  // IMPORTANTE: el monto que va al portapapeles se copia como números puros.
-  // Ejemplo: en pantalla puede verse $50,000, pero se copia exactamente: 50000
-  // Así evitamos que el juego interprete puntos o comas como decimales.
   const copyAmount = String(Math.round(total));
 
   try {
@@ -5754,8 +5701,6 @@ copyTotalBtn.addEventListener('click', async () => {
 });
 
 
-// Puente para el administrador remoto de precios.
-// Firebase modifica los mismos objetos que usa la calculadora; no duplica la lógica de cobro.
 function getPriceConfig() {
   return {
     services: Object.fromEntries(flatItems.map(item => [
@@ -5770,7 +5715,6 @@ function getPriceConfig() {
 }
 
 function readPriceEntry(entry, fallbackSale = 0, fallbackCost = 0) {
-  // Compatibilidad con la configuración vieja, donde el valor era solo un número.
   if (typeof entry === 'number') {
     return { sale: entry, cost: fallbackCost };
   }
@@ -5846,8 +5790,6 @@ console.info('Top Gear Firebase:', firebaseConfig.projectId);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Instancia separada: permite que el admin cree la cuenta de un mecánico
-// sin reemplazar su propia sesión en la calculadora.
 const userCreatorApp = initializeApp(firebaseConfig, 'topgear-user-creator');
 const userCreatorAuth = getAuth(userCreatorApp);
 const pricesRef = doc(db, 'config', 'topgear_prices');
@@ -5980,6 +5922,8 @@ const workshopWeekCount = document.querySelector('#workshopWeekCount');
 const workshopWeekTotal = document.querySelector('#workshopWeekTotal');
 const workshopWeekCost = document.querySelector('#workshopWeekCost');
 const workshopWeekProfit = document.querySelector('#workshopWeekProfit');
+const workshopWeekPayrollCard = document.querySelector('#workshopWeekPayrollCard');
+const workshopWeekPayrollPaid = document.querySelector('#workshopWeekPayrollPaid');
 const recordsDate = document.querySelector('#recordsDate');
 const recordsStartTime = document.querySelector('#recordsStartTime');
 const showVoidedRecords = document.querySelector('#showVoidedRecords');
@@ -6072,6 +6016,8 @@ let unsubscribeSales = null;
 let unsubscribeUsers = null;
 let unsubscribeCurrentUserProfile = null;
 let unsubscribePayroll = null;
+let unsubscribePayrollSummary = null;
+let allPayrollRecords = [];
 let mechanicProfiles = [];
 let loadedSales = [];
 let recordsVisibleCount = 5;
@@ -6097,7 +6043,6 @@ let agreementEditorState = {
   pendingFile: null,
 };
 let unsubscribeAgreements = null;
-
 
 
 function defaultPositionsConfig() {
@@ -6140,11 +6085,14 @@ function getPositionById(id) {
   return positionCatalog.find(item => item.id === id) || null;
 }
 
+const LEGACY_POSITION_IDS = {
+  mechanic: 'senior-mechanic',
+  supervisor: 'mechanic-chief',
+};
+
 function normalizePositionId(id) {
   const value = String(id || '').trim();
-  if (value === 'mechanic') return 'senior-mechanic'; // compatibilidad con perfiles viejos
-  if (value === 'supervisor') return 'mechanic-chief'; // compatibilidad con el rango anterior
-  return value;
+  return LEGACY_POSITION_IDS[value] || value;
 }
 
 function positionLabelFromProfile(profile) {
@@ -6155,8 +6103,6 @@ function positionLabelFromProfile(profile) {
 
 const POSITION_PERMISSIONS = {
   management: new Set(['records','team-view','team-manage','prices-view','prices-edit','agreements-view','agreements-add','agreements-edit','payroll-view','payroll-edit','positions-edit','void-direct','void-code-generate']),
-  // Jefe de mecánicos tiene acceso funcional completo, igual que Administrador.
-  // La diferencia es únicamente el nombre/puesto que se muestra en la interfaz.
   'mechanic-chief': new Set(['records','team-view','team-manage','prices-view','prices-edit','agreements-view','agreements-add','agreements-edit','payroll-view','payroll-edit','positions-edit','void-direct','void-code-generate','void-code-use']),
   'workshop-boss': new Set(['records','team-view','void-code-use']),
   'senior-mechanic': new Set([]),
@@ -6220,7 +6166,6 @@ function finishInitialPriceLoad() {
   document.body.classList.remove('prices-loading');
 }
 
-// Si Firebase tarda demasiado o hay un problema de red, no dejamos la página bloqueada para siempre.
 const priceLoadFallback = setTimeout(() => {
   finishInitialPriceLoad();
 }, 5000);
@@ -6389,8 +6334,6 @@ async function closeSession() {
 adminHomeLogout.addEventListener('click', closeSession);
 mechanicLogout.addEventListener('click', closeSession);
 accountSessionLogout.addEventListener('click', closeSession);
-
-
 
 
 function effectiveUser() {
@@ -6583,6 +6526,7 @@ async function bootstrapFirebaseConfigIfAdmin() {
     } else {
       const priceData = priceSnap.data() || {};
       const currentServices = priceData.services || {};
+      const currentPackages = priceData.packages || {};
       const missingServiceDefaults = {};
       if (!currentServices['servicio-limpieza']) {
         missingServiceDefaults['servicio-limpieza'] = { sale: 1000, cost: 0 };
@@ -6593,6 +6537,20 @@ async function bootstrapFirebaseConfigIfAdmin() {
       if (Object.keys(missingServiceDefaults).length) {
         writes.push(setDoc(pricesRef, {
           services: { ...currentServices, ...missingServiceDefaults },
+          updatedAt: serverTimestamp(),
+        }, { merge: true }));
+      }
+
+      const currentV8 = currentPackages.V8;
+      const currentV8Sale = typeof currentV8 === 'number'
+        ? currentV8
+        : Number(currentV8?.sale);
+      if (currentV8Sale === 95200) {
+        const migratedV8 = typeof currentV8 === 'number'
+          ? { sale: 88000, cost: 55000 }
+          : { ...currentV8, sale: 88000 };
+        writes.push(setDoc(pricesRef, {
+          packages: { ...currentPackages, V8: migratedV8 },
           updatedAt: serverTimestamp(),
         }, { merge: true }));
       }
@@ -6894,11 +6852,8 @@ async function compressAgreementLogo(file, maxSize = 180, quality = 0.78) {
         ctx.clearRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
 
-        // WEBP reduce muchísimo el peso. Si el navegador no lo soportara,
-        // toDataURL devolverá una imagen compatible.
         const dataUrl = canvas.toDataURL('image/webp', quality);
 
-        // Protección para no inflar el documento de Firestore.
         if (dataUrl.length > 140000) {
           reject(new Error('El logo sigue siendo demasiado pesado. Usa una imagen más simple.'));
           return;
@@ -6917,8 +6872,6 @@ async function compressAgreementLogo(file, maxSize = 180, quality = 0.78) {
 async function uploadAgreementLogoIfNeeded(itemId) {
   if (!agreementEditorState.pendingFile) return agreementEditorState.logo;
 
-  // En el plan Spark guardamos el logo ya comprimido dentro del documento
-  // de convenios de Firestore, sin depender de Cloud Storage.
   return await compressAgreementLogo(agreementEditorState.pendingFile);
 }
 
@@ -6960,7 +6913,6 @@ saveAgreementBtn.addEventListener('click', async () => {
 
     const logo = await uploadAgreementLogoIfNeeded(id);
 
-    // Quitar la versión anterior si estaba en otra categoría.
     config.forEach(group => {
       group.agreements = group.agreements.filter(item => item.id !== id);
     });
@@ -7182,7 +7134,7 @@ function setAccountView(view) {
     selectedWeekKey = getWeekKey(new Date());
     setAdminHeader('Mis ventas', currentProfile?.name || positionLabelFromProfile(currentProfile) || 'Personal');
     refreshHistoryView();
-    /* La nómina solo se carga cuando Gerencia/Jefe de mecánicos abre a alguien desde Equipo. */
+
 
   } else if (view === 'history') {
     if (hasPermission('team-view')) {
@@ -7586,7 +7538,6 @@ function saleDateObject(sale) {
   const parsed = new Date(sale?.createdAtClient || '');
   if (!Number.isNaN(parsed.getTime())) return parsed;
 
-  // Compatibilidad con registros demo/viejos con fecha dd/mm/yyyy.
   const match = String(sale?.date || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (match) {
     const [, day, month, year] = match;
@@ -7755,7 +7706,6 @@ saleSave.addEventListener('click', async () => {
     await addDoc(collection(db, 'sales'), payload);
     setStatus(saleStatus, 'Venta registrada correctamente.', 'ok');
 
-    // La venta ya quedó guardada: dejamos la calculadora lista para el siguiente cliente.
     window.stopCarAdminAPI?.resetCalculator?.();
     pendingSaleDraft = null;
 
@@ -7996,10 +7946,14 @@ payrollPosition.addEventListener('change', () => {
 });
 
 async function persistMechanicPayrollSettings() {
-  if (!hasPermission('payroll-edit') || !selectedHistoryUserId) return;
+  if (!hasPermission('payroll-edit') || !selectedHistoryUserId || !selectedWeekKey) return;
 
   const positionId = payrollPosition.value || 'senior-mechanic';
   const bankAccount = payrollBankAccount.value.trim().slice(0, 10);
+  const paymentMethod = payrollPaymentMethod.value || '';
+  const calc = payrollCalculation();
+  const key = payrollRecordKey(selectedHistoryUserId, selectedWeekKey);
+  const existing = currentPayrollRecord();
 
   const profile = mechanicProfiles.find(p => p.uid === selectedHistoryUserId);
   if (profile) {
@@ -8013,6 +7967,38 @@ async function persistMechanicPayrollSettings() {
       bankAccount,
       updatedAt: serverTimestamp(),
     }, { merge: true });
+
+    if (existing?.status !== 'paid') {
+      const pendingRecord = {
+        userId: selectedHistoryUserId,
+        userName: selectedHistoryUserName || selectedMechanicProfile?.name || '',
+        weekKey: selectedWeekKey,
+        baseSalary: calc.base,
+        hoursWorked: calc.hours,
+        paidHours: calc.hours,
+        hourlyRate: calc.hourlyRate,
+        commissionPercent: calc.effectivePercent,
+        commissionTier1Percent: calc.commissionTiers.first,
+        commissionTier2Percent: calc.commissionTiers.second,
+        commissionTier3Percent: calc.commissionTiers.excess,
+        weeklyProfit: calc.profit,
+        commissionAmount: calc.commission,
+        salaryTotal: calc.total,
+        positionId,
+        positionName: getPositionById(positionId)?.name || 'Mecánico experimentado',
+        bankAccount,
+        paymentMethod,
+        status: 'pending',
+        updatedAtClient: new Date().toISOString(),
+      };
+
+      payrollRecords[key] = { ...(existing || {}), ...pendingRecord };
+      await setDoc(doc(db, 'payroll', key), {
+        ...pendingRecord,
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+    }
+
     setStatus(payrollStatus, 'Datos de nómina guardados.', 'ok');
   } catch (error) {
     console.error(error);
@@ -8021,6 +8007,8 @@ async function persistMechanicPayrollSettings() {
 }
 
 savePayrollSettings.addEventListener('click', persistMechanicPayrollSettings);
+payrollHours.addEventListener('change', persistMechanicPayrollSettings);
+payrollPaymentMethod.addEventListener('change', persistMechanicPayrollSettings);
 
 async function markSelectedPayrollPaid() {
   if (!hasPermission('payroll-edit') || !selectedHistoryUserId || !selectedWeekKey) return;
@@ -8263,6 +8251,37 @@ function refreshHistoryView() {
 historySearch.addEventListener('input', refreshHistoryView);
 
 
+function subscribeToPayrollSummary() {
+  if (unsubscribePayrollSummary) {
+    unsubscribePayrollSummary();
+    unsubscribePayrollSummary = null;
+  }
+
+  allPayrollRecords = [];
+  if (!hasPermission('payroll-view')) {
+    if (workshopWeekPayrollCard) workshopWeekPayrollCard.hidden = true;
+    refreshWorkshopWeeklySummary();
+    return;
+  }
+
+  if (workshopWeekPayrollCard) workshopWeekPayrollCard.hidden = false;
+  unsubscribePayrollSummary = onSnapshot(
+    collection(db, 'payroll'),
+    snapshot => {
+      allPayrollRecords = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
+      refreshWorkshopWeeklySummary();
+    },
+    error => {
+      console.error(error);
+      allPayrollRecords = [];
+      if (workshopWeekPayrollPaid) workshopWeekPayrollPaid.textContent = '$0';
+    }
+  );
+}
+
 function refreshWorkshopWeeklySummary() {
   if (!recordsSummaryWeekSelect) return;
 
@@ -8295,6 +8314,9 @@ function refreshWorkshopWeeklySummary() {
   const total = activeSales.reduce((sum, sale) => sum + (Number(sale.total) || 0), 0);
   const cost = activeSales.reduce((sum, sale) => sum + (Number(sale.costTotal) || 0), 0);
   const profit = activeSales.reduce((sum, sale) => sum + (Number(sale.profit) || 0), 0);
+  const payrollPaid = allPayrollRecords
+    .filter(record => record.weekKey === selectedRecordsWeekKey && record.status === 'paid')
+    .reduce((sum, record) => sum + (Number(record.salaryTotal) || 0), 0);
 
   workshopWeekSummaryLabel.textContent = selectedRecordsWeekKey === currentWeekKey()
     ? `Semana actual · domingo 00:00 a sábado 23:59 · ${formatWeekRange(selectedRecordsWeekKey)}`
@@ -8303,6 +8325,8 @@ function refreshWorkshopWeeklySummary() {
   workshopWeekTotal.textContent = formatMoney(total);
   workshopWeekCost.textContent = formatMoney(cost);
   workshopWeekProfit.textContent = formatMoney(profit);
+  if (workshopWeekPayrollPaid) workshopWeekPayrollPaid.textContent = formatMoney(payrollPaid);
+  if (workshopWeekPayrollCard) workshopWeekPayrollCard.hidden = !hasPermission('payroll-view');
 }
 
 function selectedRecordsDateObject() {
@@ -8339,8 +8363,6 @@ function refreshAdminRecordsView() {
   const selectedDate = selectedRecordsDateObject();
   const startMinutes = selectedRecordsStartMinutes();
 
-  // REGISTROS incluye ventas de todos los usuarios con acceso: también las creadas por Administrador.
-  // No filtramos por role/positionId; únicamente por fecha, hora y búsqueda.
   const periodMatches = loadedSales
     .filter(sale => isSaleInSelectedRecordsPeriod(sale, selectedDate, startMinutes))
     .filter(sale => !queryText || searchableSaleText(sale).includes(queryText));
@@ -8480,7 +8502,6 @@ recordsLoadMore.addEventListener('click', () => {
 
 function canAssignPosition(positionId) {
   const id = normalizePositionId(positionId);
-  // Administrador y Jefe de mecánicos pueden asignar cualquier puesto.
   if (currentRole === 'admin' || permissionPositionId() === 'mechanic-chief' || permissionPositionId() === 'management') return true;
   return false;
 }
@@ -8572,10 +8593,8 @@ saveMechanicBtn.addEventListener('click', async () => {
 
   let createdCredential = null;
   try {
-    // 1) Authentication: la cuenta con el correo/contraseña que tú entregarás por fuera.
     createdCredential = await createUserWithEmailAndPassword(userCreatorAuth, email, password);
 
-    // 2) Firestore: el perfil que autoriza el acceso real a la calculadora.
     await setDoc(doc(db, 'users', createdCredential.user.uid), {
       name,
       email,
@@ -8595,8 +8614,6 @@ saveMechanicBtn.addEventListener('click', async () => {
   } catch (error) {
     console.error('No se pudo crear el mecánico.', error);
 
-    // Si Auth sí alcanzó a crear la cuenta pero Firestore falló,
-    // intentamos borrar esa cuenta recién creada para no dejar un usuario huérfano.
     if (createdCredential?.user) {
       try { await deleteUser(createdCredential.user); } catch (cleanupError) { console.error('No se pudo limpiar la cuenta incompleta.', cleanupError); }
     }
@@ -8938,7 +8955,6 @@ function subscribeToCurrentUserProfile(user) {
       const profile = { uid: snapshot.id, ...snapshot.data() };
       if (!applyCurrentUserProfile(user, profile)) return;
 
-      // Si un admin cambia nombre, puesto o estado, la sesión lo refleja sin recargar.
       if (!overlay.classList.contains('is-open')) return;
       if (!historyPanel.hidden) refreshHistoryView();
       if (!accountSessionPanel.hidden) showAccountSession();
@@ -9061,8 +9077,6 @@ setInterval(() => {
 
   lastKnownCurrentWeekKey = nextKey;
 
-  // No se borra nada: simplemente la "semana actual" cambia.
-  // Las semanas anteriores siguen disponibles en los botones.
   if (selectedWeekKey && selectedWeekKey !== nextKey) {
     selectedWeekKey = nextKey;
   }
@@ -9074,7 +9088,6 @@ setInterval(() => {
 onAuthStateChanged(auth, async user => {
   const loggedIn = Boolean(user);
   document.body.classList.toggle('session-active', loggedIn);
-  // La calculadora permanece oculta hasta validar también el perfil de Firestore.
   document.body.classList.add('auth-locked');
 
   hideAllAccountPanels();
@@ -9095,6 +9108,11 @@ onAuthStateChanged(auth, async user => {
       unsubscribePayroll();
       unsubscribePayroll = null;
     }
+    if (unsubscribePayrollSummary) {
+      unsubscribePayrollSummary();
+      unsubscribePayrollSummary = null;
+    }
+    allPayrollRecords = [];
     if (unsubscribeUsers) {
       unsubscribeUsers();
       unsubscribeUsers = null;
@@ -9156,6 +9174,7 @@ onAuthStateChanged(auth, async user => {
   subscribeToCurrentUserProfile(user);
   subscribeToSales(user);
   subscribeToUsers();
+  subscribeToPayrollSummary();
   subscribeToAgreements();
   subscribeToPositions();
   subscribeToPrices();
@@ -9164,7 +9183,6 @@ onAuthStateChanged(auth, async user => {
   setAdminOpen(false);
 });
 
-// Precios en tiempo real, únicamente después de validar una sesión activa.
 function subscribeToPrices() {
   if (unsubscribePrices) {
     unsubscribePrices();
@@ -9199,9 +9217,7 @@ function subscribeToPrices() {
 
 
 <script>
-/* Guardia de teclado para edición dentro de modales/paneles.
-   Backspace/Delete siguen borrando normalmente, pero no se propagan fuera
-   del campo editable ni provocan navegación/cierre accidental del preview. */
+
 window.addEventListener('keydown', function (event) {
   const el = event.target;
   const editable = el && (
