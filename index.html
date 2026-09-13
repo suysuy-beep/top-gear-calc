@@ -1700,7 +1700,8 @@ body.view-admin #costTotal { color: #c6ced3; }
 .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(2) { grid-column: span 8; }
 .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(3),
 .mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(4),
-.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(5) { grid-column: span 4; }
+.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(5),
+.mechanic-create-editor .mechanic-create-grid > .payroll-field:nth-child(6) { grid-column: span 3; }
 
 
 .mechanic-edit-editor .mechanic-create-grid {
@@ -4518,6 +4519,11 @@ body.view-admin .admin-detail-only { display: block !important; }
                   <input id="newMechanicBankAccount" type="text" maxlength="10" inputmode="numeric" placeholder="Máx. 10 caracteres" autocomplete="off" />
                 </label>
 
+                <label class="payroll-field">
+                  <span>ID de Discord (opcional)</span>
+                  <input id="newMechanicDiscordId" type="text" maxlength="25" inputmode="numeric" placeholder="Ej. 123456789012345678" autocomplete="off" />
+                </label>
+
                 <div class="mechanic-create-note">
                   <strong>La contraseña no se guarda en la calculadora.</strong> Tú se la entregas al mecánico por fuera. Al crear la cuenta queda activa inmediatamente.
                 </div>
@@ -4563,7 +4569,12 @@ body.view-admin .admin-detail-only { display: block !important; }
                   <input id="editMechanicBankAccount" type="text" maxlength="10" inputmode="numeric" placeholder="Máx. 10 caracteres" autocomplete="off" />
                 </label>
 
-                <div class="mechanic-edit-email-note">El correo de inicio no se cambia desde aquí para no desincronizar Authentication. Nombre, puesto y cuenta sí se actualizan desde la calculadora.</div>
+                <label class="payroll-field">
+                  <span>ID de Discord</span>
+                  <input id="editMechanicDiscordId" type="text" maxlength="25" inputmode="numeric" placeholder="Ej. 123456789012345678" autocomplete="off" />
+                </label>
+
+                <div class="mechanic-edit-email-note">El correo de inicio no se cambia desde aquí para no desincronizar Authentication. El ID de Discord vincula sus fichajes con la nómina.</div>
               </div>
             </div>
 
@@ -5894,6 +5905,7 @@ const newMechanicEmail = document.querySelector('#newMechanicEmail');
 const newMechanicPassword = document.querySelector('#newMechanicPassword');
 const newMechanicPosition = document.querySelector('#newMechanicPosition');
 const newMechanicBankAccount = document.querySelector('#newMechanicBankAccount');
+const newMechanicDiscordId = document.querySelector('#newMechanicDiscordId');
 const mechanicEditEditor = document.querySelector('#mechanicEditEditor');
 const mechanicEditTitle = document.querySelector('#mechanicEditTitle');
 const mechanicEditClose = document.querySelector('#mechanicEditClose');
@@ -5901,6 +5913,7 @@ const editMechanicName = document.querySelector('#editMechanicName');
 const editMechanicEmail = document.querySelector('#editMechanicEmail');
 const editMechanicPosition = document.querySelector('#editMechanicPosition');
 const editMechanicBankAccount = document.querySelector('#editMechanicBankAccount');
+const editMechanicDiscordId = document.querySelector('#editMechanicDiscordId');
 const cancelMechanicEdit = document.querySelector('#cancelMechanicEdit');
 const saveMechanicEdit = document.querySelector('#saveMechanicEdit');
 const mechanicEditStatus = document.querySelector('#mechanicEditStatus');
@@ -7867,6 +7880,20 @@ function updatePayrollCalculationUI(calc = payrollCalculation()) {
   }
 }
 
+function payrollHoursFromRecord(record) {
+  if (record?.attendanceSource === 'discord' && Number.isFinite(Number(record?.attendanceSeconds))) {
+    return payrollPaidHours(Number(record.attendanceSeconds) / 3600);
+  }
+  return payrollPaidHours(record?.hoursWorked ?? 0);
+}
+
+function formatAttendanceDuration(seconds) {
+  const totalMinutes = Math.max(0, Math.floor((Number(seconds) || 0) / 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours} h ${minutes} min`;
+}
+
 function renderPayrollPanel() {
   if (!hasPermission('payroll-view') || !selectedHistoryUserId || !selectedWeekKey) return;
 
@@ -7885,14 +7912,18 @@ function renderPayrollPanel() {
   payrollPosition.value = chosenPositionId;
   payrollBaseSalary.value = '0';
   payrollCommission.value = '0';
-  payrollHours.value = String(record?.hoursWorked ?? 0);
+  const attendanceSynced = record?.attendanceSource === 'discord';
+  payrollHours.value = String(payrollHoursFromRecord(record));
   payrollBankAccount.value = record?.bankAccount ?? defaults.bankAccount ?? '';
   payrollPaymentMethod.value = record?.paymentMethod || '';
 
   const canEditPayroll = hasPermission('payroll-edit');
   payrollPanel.classList.toggle('payroll-readonly', !canEditPayroll);
   payrollPosition.disabled = !canEditPayroll;
-  payrollHours.disabled = !canEditPayroll;
+  payrollHours.disabled = !canEditPayroll || attendanceSynced;
+  payrollHours.title = attendanceSynced
+    ? `Sincronizado desde Discord: ${formatAttendanceDuration(record.attendanceSeconds)}`
+    : 'Horas pagadas de la semana';
   payrollBankAccount.disabled = !canEditPayroll;
   savePayrollSettings.hidden = !canEditPayroll;
   markPayrollPaid.hidden = !canEditPayroll;
@@ -7923,6 +7954,14 @@ function renderPayrollPanel() {
       `Pagado por ${method}${record.paidAtClient ? ` · ${new Date(record.paidAtClient).toLocaleString('es-MX')}` : ''}.`,
       'ok'
     );
+  } else if (attendanceSynced) {
+    setStatus(
+      payrollStatus,
+      `Horas sincronizadas desde Discord: ${formatAttendanceDuration(record.attendanceSeconds)} registradas · ${payrollHours.value} h pagadas.`,
+      'ok'
+    );
+  } else if (profile.discordId) {
+    setStatus(payrollStatus, 'Discord vinculado. Las horas aparecerán aquí al cerrar un fichaje o al ejecutar /sincronizar-horas.');
   } else {
     setStatus(payrollStatus, 'Fórmula: pago por horas + comisión escalonada sobre la ganancia semanal.');
   }
@@ -8527,11 +8566,19 @@ function fillNewMechanicPositionOptions() {
   }
 }
 
+function normalizeDiscordId(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const match = raw.match(/\d{15,25}/);
+  return match?.[0] || '';
+}
+
 function resetMechanicCreateForm() {
   newMechanicName.value = '';
   newMechanicEmail.value = '';
   newMechanicPassword.value = '';
   newMechanicBankAccount.value = '';
+  newMechanicDiscordId.value = '';
   fillNewMechanicPositionOptions();
   if ([...newMechanicPosition.options].some(option => option.value === 'senior-mechanic')) {
     newMechanicPosition.value = 'senior-mechanic';
@@ -8571,6 +8618,14 @@ saveMechanicBtn.addEventListener('click', async () => {
   const password = newMechanicPassword.value;
   const positionId = newMechanicPosition.value || 'senior-mechanic';
   const bankAccount = newMechanicBankAccount.value.trim().slice(0, 10);
+  const discordRaw = newMechanicDiscordId.value.trim();
+  const discordId = normalizeDiscordId(discordRaw);
+
+  if (discordRaw && !discordId) {
+    setStatus(mechanicCreateStatus, 'El ID de Discord no parece válido. Copia el ID numérico del usuario.', 'error');
+    newMechanicDiscordId.focus();
+    return;
+  }
 
   if (!name) {
     setStatus(mechanicCreateStatus, 'Escribe el nombre del mecánico.', 'error');
@@ -8602,6 +8657,7 @@ saveMechanicBtn.addEventListener('click', async () => {
       active: true,
       positionId,
       bankAccount,
+      discordId,
       createdAt: serverTimestamp(),
       createdBy: auth.currentUser.uid,
       updatedAt: serverTimestamp(),
@@ -8653,6 +8709,7 @@ function openMechanicEdit(profile) {
   editMechanicEmail.value = profile.email || '';
   fillEditMechanicPositionOptions(normalizePositionId(profile.positionId) || 'senior-mechanic');
   editMechanicBankAccount.value = String(profile.bankAccount || '').slice(0, 10);
+  editMechanicDiscordId.value = String(profile.discordId || '');
   setStatus(mechanicEditStatus, '');
   mechanicEditEditor.hidden = false;
   setTimeout(() => editMechanicName.focus(), 50);
@@ -8673,6 +8730,14 @@ saveMechanicEdit.addEventListener('click', async () => {
   const name = editMechanicName.value.trim();
   const positionId = editMechanicPosition.value || 'senior-mechanic';
   const bankAccount = editMechanicBankAccount.value.trim().slice(0, 10);
+  const discordRaw = editMechanicDiscordId.value.trim();
+  const discordId = normalizeDiscordId(discordRaw);
+
+  if (discordRaw && !discordId) {
+    setStatus(mechanicEditStatus, 'El ID de Discord no parece válido. Copia el ID numérico del usuario.', 'error');
+    editMechanicDiscordId.focus();
+    return;
+  }
 
   if (!name) {
     setStatus(mechanicEditStatus, 'Escribe el nombre del mecánico.', 'error');
@@ -8687,6 +8752,7 @@ saveMechanicEdit.addEventListener('click', async () => {
       name,
       positionId,
       bankAccount,
+      discordId,
       updatedAt: serverTimestamp(),
       updatedBy: auth.currentUser?.uid || '',
     }, { merge: true });
@@ -8696,9 +8762,10 @@ saveMechanicEdit.addEventListener('click', async () => {
       profile.name = name;
       profile.positionId = positionId;
       profile.bankAccount = bankAccount;
+      profile.discordId = discordId;
     }
     if (selectedMechanicProfile?.uid === selectedMechanicEditUid) {
-      selectedMechanicProfile = { ...selectedMechanicProfile, name, positionId, bankAccount };
+      selectedMechanicProfile = { ...selectedMechanicProfile, name, positionId, bankAccount, discordId };
       selectedHistoryUserName = name;
     }
 
