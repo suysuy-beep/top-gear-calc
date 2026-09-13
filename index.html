@@ -3798,6 +3798,56 @@ body.view-admin .admin-detail-only { display: block !important; }
   }
 }
 
+/* ===== NÓMINA DINÁMICA: HORAS + COMISIÓN ESCALONADA ===== */
+.position-pay-scheme-note {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 5px;
+  padding: 11px 12px;
+  border: 1px solid rgba(63,211,90,.22);
+  border-radius: 8px;
+  background: rgba(63,211,90,.045);
+}
+.position-pay-scheme-note strong { color: #e9f5ec; font-size: 10px; }
+.position-pay-scheme-note span { color: #8e9a91; font-size: 9px; line-height: 1.5; }
+.payroll-hours-grid {
+  grid-template-columns: minmax(170px,1fr) minmax(120px,150px) minmax(140px,190px) !important;
+}
+.payroll-hours-field input {
+  text-align: center;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.payroll-formula-hint {
+  margin-top: 9px;
+  padding: 8px 10px;
+  border: 1px solid rgba(63,211,90,.18);
+  border-radius: 7px;
+  background: rgba(63,211,90,.035);
+  color: #8fa099;
+  font-size: 9px;
+  line-height: 1.45;
+}
+.payroll-breakdown-dynamic {
+  grid-template-columns: repeat(4, minmax(0,1fr));
+}
+.payroll-breakdown-dynamic small {
+  display: block;
+  margin-top: 4px;
+  color: #6f7c82;
+  font-size: 7.5px;
+  line-height: 1.35;
+}
+@media (max-width: 760px) {
+  .payroll-hours-grid,
+  .payroll-breakdown-dynamic { grid-template-columns: 1fr 1fr !important; }
+  .payroll-bank-compact { max-width: none; justify-self: stretch; }
+}
+@media (max-width: 520px) {
+  .payroll-hours-grid,
+  .payroll-breakdown-dynamic { grid-template-columns: 1fr !important; }
+}
+
 
 
 /* ===== PERMISOS / CÓDIGO DIARIO DE ANULACIONES ===== */
@@ -4184,7 +4234,7 @@ body.view-admin .admin-detail-only { display: block !important; }
             <div>
               <div class="account-role-badge admin-role">Administrador</div>
               <div class="mechanic-welcome">Puestos</div>
-              <div class="admin-user">Administra los puestos del taller y sus pagos base.</div>
+              <div class="admin-user">Administra los puestos del taller. La nómina se calcula con horas + comisión escalonada.</div>
             </div>
           </div>
 
@@ -4211,7 +4261,7 @@ body.view-admin .admin-detail-only { display: block !important; }
             <div class="agreement-editor-body">
               <div class="agreement-logo-editor">
                 <div id="positionPreviewIcon" class="agreement-logo-preview">⌁</div>
-                <small>Configura el nombre del puesto y su paga por defecto.</small>
+                <small>El pago se calcula automáticamente desde la nómina según horas y ganancia generada.</small>
               </div>
 
               <div class="agreement-editor-fields">
@@ -4220,15 +4270,13 @@ body.view-admin .admin-detail-only { display: block !important; }
                   <input id="positionNameInput" type="text" maxlength="60" placeholder="Ej. Jefe de taller" />
                 </label>
 
-                <label class="payroll-field">
-                  <span>Sueldo base semanal</span>
-                  <input id="positionBaseInput" type="number" min="0" step="1" inputmode="numeric" />
-                </label>
+                <input id="positionBaseInput" type="hidden" value="0" />
+                <input id="positionCommissionInput" type="hidden" value="0" />
 
-                <label class="payroll-field">
-                  <span>% sobre ganancia</span>
-                  <input id="positionCommissionInput" type="number" min="0" max="100" step="0.1" inputmode="decimal" />
-                </label>
+                <div class="position-pay-scheme-note">
+                  <strong>Pago automático</strong>
+                  <span>Mecánico en pruebas: 20% / 10% / 5%. Los demás puestos: 30% / 20% / 10%. El sueldo por horas se calcula aparte.</span>
+                </div>
 
                 <label class="agreement-active-field">
                   <input id="positionActiveInput" type="checkbox" checked />
@@ -4592,10 +4640,15 @@ body.view-admin .admin-detail-only { display: block !important; }
               <span id="payrollStatusBadge" class="payroll-status-badge pending">Pendiente</span>
             </div>
 
-            <div class="payroll-form-grid payroll-compact-grid">
+            <div class="payroll-form-grid payroll-compact-grid payroll-hours-grid">
               <label class="payroll-field">
                 <span>Puesto</span>
                 <select id="payrollPosition"></select>
+              </label>
+
+              <label class="payroll-field payroll-hours-field">
+                <span>Horas de la semana</span>
+                <input id="payrollHours" type="number" min="0" max="10" step="1" inputmode="numeric" placeholder="0 a 10" />
               </label>
 
               <label class="payroll-field payroll-bank-compact">
@@ -4607,10 +4660,13 @@ body.view-admin .admin-detail-only { display: block !important; }
               <input id="payrollCommission" type="hidden" />
             </div>
 
-            <div class="payroll-breakdown">
-              <div><span>Base</span><strong id="payrollBasePreview">$0</strong></div>
-              <div><span>Comisión</span><strong id="payrollCommissionPreview">$0</strong></div>
-              <div class="payroll-total-box"><span>Sueldo semana</span><strong id="payrollTotalPreview">$0</strong></div>
+            <div id="payrollFormulaHint" class="payroll-formula-hint">Ingresa las horas para calcular la tarifa y la comisión automáticamente.</div>
+
+            <div class="payroll-breakdown payroll-breakdown-dynamic">
+              <div><span>Pago por horas</span><strong id="payrollBasePreview">$0</strong><small id="payrollHoursPreview">0 h</small></div>
+              <div><span>Ganancia generada</span><strong id="payrollProfitPreview">$0</strong><small>Ventas activas de la semana</small></div>
+              <div><span>Comisión</span><strong id="payrollCommissionPreview">$0</strong><small id="payrollCommissionRatePreview">—</small></div>
+              <div class="payroll-total-box"><span>Sueldo semana</span><strong id="payrollTotalPreview">$0</strong><small>Horas + comisión</small></div>
             </div>
 
             <div class="payroll-pay-row">
@@ -5952,9 +6008,14 @@ const payrollMechanicName = document.querySelector('#payrollMechanicName');
 const payrollStatusBadge = document.querySelector('#payrollStatusBadge');
 const payrollBaseSalary = document.querySelector('#payrollBaseSalary');
 const payrollCommission = document.querySelector('#payrollCommission');
+const payrollHours = document.querySelector('#payrollHours');
 const payrollBankAccount = document.querySelector('#payrollBankAccount');
 const payrollBasePreview = document.querySelector('#payrollBasePreview');
+const payrollHoursPreview = document.querySelector('#payrollHoursPreview');
+const payrollProfitPreview = document.querySelector('#payrollProfitPreview');
 const payrollCommissionPreview = document.querySelector('#payrollCommissionPreview');
+const payrollCommissionRatePreview = document.querySelector('#payrollCommissionRatePreview');
+const payrollFormulaHint = document.querySelector('#payrollFormulaHint');
 const payrollTotalPreview = document.querySelector('#payrollTotalPreview');
 const payrollPaymentMethod = document.querySelector('#payrollPaymentMethod');
 const savePayrollSettings = document.querySelector('#savePayrollSettings');
@@ -6041,11 +6102,11 @@ let unsubscribeAgreements = null;
 
 function defaultPositionsConfig() {
   return [
-    { id: 'management', name: 'Gerencia', baseSalary: 2500, commissionPercent: 5, active: true },
-    { id: 'mechanic-chief', name: 'Jefe de mecánicos', baseSalary: 2200, commissionPercent: 6, active: true },
-    { id: 'workshop-boss', name: 'Jefe de taller', baseSalary: 1900, commissionPercent: 7, active: true },
-    { id: 'senior-mechanic', name: 'Mecánico experimentado', baseSalary: 1600, commissionPercent: 8, active: true },
-    { id: 'trial-mechanic', name: 'Mecánico en pruebas', baseSalary: 1000, commissionPercent: 5, active: true },
+    { id: 'management', name: 'Gerencia', baseSalary: 0, commissionPercent: 0, active: true },
+    { id: 'mechanic-chief', name: 'Jefe de mecánicos', baseSalary: 0, commissionPercent: 0, active: true },
+    { id: 'workshop-boss', name: 'Jefe de taller', baseSalary: 0, commissionPercent: 0, active: true },
+    { id: 'senior-mechanic', name: 'Mecánico experimentado', baseSalary: 0, commissionPercent: 0, active: true },
+    { id: 'trial-mechanic', name: 'Mecánico en pruebas', baseSalary: 0, commissionPercent: 0, active: true },
   ];
 }
 
@@ -6354,8 +6415,8 @@ function openPositionEditor(id = null) {
 
   positionEditorTitle.textContent = item ? `Editar · ${item.name}` : 'Nuevo puesto';
   positionNameInput.value = item?.name || '';
-  positionBaseInput.value = String(item?.baseSalary ?? 1600);
-  positionCommissionInput.value = String(item?.commissionPercent ?? 8);
+  positionBaseInput.value = '0';
+  positionCommissionInput.value = '0';
   positionActiveInput.checked = item ? item.active !== false : true;
   positionPreviewIcon.textContent = (item?.name || positionNameInput.value || '⌁').trim().charAt(0).toUpperCase() || '⌁';
   deletePositionBtn.hidden = !item;
@@ -6406,13 +6467,14 @@ function renderPositionsAdminList() {
 
     const meta = document.createElement('div');
     meta.className = 'agreements-admin-meta';
-    meta.textContent = `Base ${formatMoney(item.baseSalary)} · ${item.commissionPercent}%${item.active === false ? ' · Inactivo' : ''}`;
+    const scheme = payrollCommissionTiers(item.id);
+    meta.textContent = `Comisión ${scheme.label} · horas dinámicas${item.active === false ? ' · Inactivo' : ''}`;
 
     main.append(name, meta);
 
     const percent = document.createElement('div');
     percent.className = 'agreements-admin-percent';
-    percent.textContent = `${item.commissionPercent}%`;
+    percent.textContent = payrollCommissionTiers(item.id).label;
 
     const edit = document.createElement('button');
     edit.type = 'button';
@@ -6450,8 +6512,8 @@ async function persistPositionsConfig(nextPositions, statusMessage = 'Puestos ac
 savePositionBtn.addEventListener('click', async () => {
   if (!hasPermission('positions-edit')) return;
   const name = positionNameInput.value.trim();
-  const baseSalary = Math.max(0, Math.round(Number(positionBaseInput.value) || 0));
-  const commissionPercent = Math.max(0, Number(positionCommissionInput.value) || 0);
+  const baseSalary = 0;
+  const commissionPercent = 0;
 
   if (!name) {
     setStatus(positionsAdminStatus, 'Escribe el nombre del puesto.', 'error');
@@ -7157,7 +7219,7 @@ function setAccountView(view) {
 
   } else if (view === 'positions' && hasPermission('positions-edit')) {
     adminPositionsPanel.hidden = false;
-    setAdminHeader('Puestos', 'Jerarquías y nómina base', 'history');
+    setAdminHeader('Puestos', 'Jerarquías del taller', 'history');
     renderPositionsAdminList();
 
   } else {
@@ -7767,13 +7829,92 @@ function weeklyProfitForPayroll() {
   return selectedWeekSalesRaw().reduce((sum, sale) => sum + (Number(sale.profit) || 0), 0);
 }
 
+const PAYROLL_HOURLY_RATES = Object.freeze({
+  0: 0,
+  1: 4000,
+  2: 6000,
+  3: 8000,
+  4: 10000,
+  5: 12000,
+  6: 14000,
+  7: 16000,
+  8: 18000,
+  9: 19000,
+  10: 20000,
+});
+
+function payrollPaidHours(rawHours) {
+  return Math.max(0, Math.min(10, Math.floor(Number(rawHours) || 0)));
+}
+
+function payrollHourlyRate(hours) {
+  return PAYROLL_HOURLY_RATES[payrollPaidHours(hours)] || 0;
+}
+
+function payrollCommissionTiers(positionId) {
+  const id = normalizePositionId(positionId);
+  if (id === 'trial-mechanic') {
+    return { first: 20, second: 10, excess: 5, label: '20% / 10% / 5%' };
+  }
+  return { first: 30, second: 20, excess: 10, label: '30% / 20% / 10%' };
+}
+
+function calculateTieredCommission(profit, positionId) {
+  const amount = Math.max(0, Number(profit) || 0);
+  const tiers = payrollCommissionTiers(positionId);
+  const firstAmount = Math.min(amount, 500000);
+  const secondAmount = Math.min(Math.max(amount - 500000, 0), 500000);
+  const excessAmount = Math.max(amount - 1000000, 0);
+  const firstCommission = firstAmount * (tiers.first / 100);
+  const secondCommission = secondAmount * (tiers.second / 100);
+  const excessCommission = excessAmount * (tiers.excess / 100);
+  return {
+    ...tiers,
+    firstAmount,
+    secondAmount,
+    excessAmount,
+    amount: Math.round(firstCommission + secondCommission + excessCommission),
+  };
+}
+
 function payrollCalculation() {
-  const base = Math.max(0, Number(payrollBaseSalary.value) || 0);
-  const percent = Math.max(0, Number(payrollCommission.value) || 0);
+  const hours = payrollPaidHours(payrollHours?.value);
+  const hourlyRate = payrollHourlyRate(hours);
+  const base = Math.round(hours * hourlyRate);
   const profit = Math.max(0, weeklyProfitForPayroll());
-  const commission = Math.round(profit * (percent / 100));
+  const positionId = payrollPosition?.value || selectedMechanicProfile?.positionId || 'senior-mechanic';
+  const tiered = calculateTieredCommission(profit, positionId);
+  const commission = tiered.amount;
   const total = Math.round(base + commission);
-  return { base, percent, profit, commission, total };
+  const effectivePercent = profit > 0 ? (commission / profit) * 100 : 0;
+  return {
+    base,
+    hours,
+    hourlyRate,
+    profit,
+    commission,
+    total,
+    effectivePercent,
+    commissionTiers: tiered,
+  };
+}
+
+function updatePayrollCalculationUI(calc = payrollCalculation()) {
+  payrollBasePreview.textContent = formatMoney(calc.base);
+  if (payrollHoursPreview) {
+    payrollHoursPreview.textContent = `${calc.hours} h × ${formatMoney(calc.hourlyRate)}/h`;
+  }
+  if (payrollProfitPreview) payrollProfitPreview.textContent = formatMoney(calc.profit);
+  payrollCommissionPreview.textContent = formatMoney(calc.commission);
+  if (payrollCommissionRatePreview) {
+    payrollCommissionRatePreview.textContent = `${calc.commissionTiers.label} · efectivo ${calc.effectivePercent.toFixed(1)}%`;
+  }
+  payrollTotalPreview.textContent = formatMoney(calc.total);
+  if (payrollFormulaHint) {
+    payrollFormulaHint.textContent = calc.hours >= 10
+      ? `Tope alcanzado: ${calc.hours} h pagadas a ${formatMoney(calc.hourlyRate)}/h. Comisión: ${calc.commissionTiers.label} por tramos de ganancia.`
+      : `${calc.hours} h → ${formatMoney(calc.hourlyRate)}/h. Comisión: ${calc.commissionTiers.label} por tramos de ganancia.`;
+  }
 }
 
 function renderPayrollPanel() {
@@ -7792,25 +7933,26 @@ function renderPayrollPanel() {
   payrollMechanicRole.textContent = `⟡ ${getPositionById(chosenPositionId)?.name || defaults.positionName}`;
 
   payrollPosition.value = chosenPositionId;
-  payrollBaseSalary.value = String(record?.baseSalary ?? defaults.baseSalary);
-  payrollCommission.value = String(record?.commissionPercent ?? defaults.commissionPercent);
+  payrollBaseSalary.value = '0';
+  payrollCommission.value = '0';
+  payrollHours.value = String(record?.hoursWorked ?? 0);
   payrollBankAccount.value = record?.bankAccount ?? defaults.bankAccount ?? '';
   payrollPaymentMethod.value = record?.paymentMethod || '';
 
   const canEditPayroll = hasPermission('payroll-edit');
   payrollPanel.classList.toggle('payroll-readonly', !canEditPayroll);
   payrollPosition.disabled = !canEditPayroll;
+  payrollHours.disabled = !canEditPayroll;
   payrollBankAccount.disabled = !canEditPayroll;
   savePayrollSettings.hidden = !canEditPayroll;
   markPayrollPaid.hidden = !canEditPayroll;
   reopenPayroll.hidden = !canEditPayroll;
 
   const calc = payrollCalculation();
-  payrollBasePreview.textContent = formatMoney(calc.base);
-  payrollCommissionPreview.textContent = formatMoney(calc.commission);
-  payrollTotalPreview.textContent = formatMoney(calc.total);
+  updatePayrollCalculationUI(calc);
 
   const paid = record?.status === 'paid';
+  if (paid) payrollHours.disabled = true;
   payrollStatusBadge.classList.toggle('paid', paid);
   payrollStatusBadge.classList.toggle('pending', !paid);
   payrollStatusBadge.textContent = paid ? 'Pagado' : 'Pendiente';
@@ -7832,26 +7974,24 @@ function renderPayrollPanel() {
       'ok'
     );
   } else {
-    setStatus(payrollStatus, 'Fórmula provisional: sueldo base + porcentaje de la ganancia semanal.');
+    setStatus(payrollStatus, 'Fórmula: pago por horas + comisión escalonada sobre la ganancia semanal.');
   }
 }
 
 function updatePayrollPreview() {
   if (!hasPermission('payroll-view')) return;
-  const calc = payrollCalculation();
-  payrollBasePreview.textContent = formatMoney(calc.base);
-  payrollCommissionPreview.textContent = formatMoney(calc.commission);
-  payrollTotalPreview.textContent = formatMoney(calc.total);
+  updatePayrollCalculationUI(payrollCalculation());
 }
 
-payrollBaseSalary.addEventListener('input', updatePayrollPreview);
-payrollCommission.addEventListener('input', updatePayrollPreview);
+payrollHours.addEventListener('input', () => {
+  const value = Math.max(0, Math.min(10, Math.floor(Number(payrollHours.value) || 0)));
+  if (String(value) !== payrollHours.value && payrollHours.value !== '') payrollHours.value = String(value);
+  updatePayrollPreview();
+});
 payrollPosition.addEventListener('change', () => {
   const position = getPositionById(payrollPosition.value);
   if (!position) return;
   payrollMechanicRole.textContent = `⟡ ${position.name}`;
-  payrollBaseSalary.value = String(position.baseSalary);
-  payrollCommission.value = String(position.commissionPercent);
   updatePayrollPreview();
 });
 
@@ -7898,7 +8038,13 @@ async function markSelectedPayrollPaid() {
     userName: selectedHistoryUserName || selectedMechanicProfile?.name || '',
     weekKey: selectedWeekKey,
     baseSalary: calc.base,
-    commissionPercent: calc.percent,
+    hoursWorked: calc.hours,
+    paidHours: calc.hours,
+    hourlyRate: calc.hourlyRate,
+    commissionPercent: calc.effectivePercent,
+    commissionTier1Percent: calc.commissionTiers.first,
+    commissionTier2Percent: calc.commissionTiers.second,
+    commissionTier3Percent: calc.commissionTiers.excess,
     weeklyProfit: calc.profit,
     commissionAmount: calc.commission,
     salaryTotal: calc.total,
