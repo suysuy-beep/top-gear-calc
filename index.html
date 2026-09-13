@@ -4251,7 +4251,7 @@ body.view-admin .admin-detail-only { display: block !important; }
 
                 <div class="position-pay-scheme-note">
                   <strong>Pago automático</strong>
-                  <span>Mecánico en pruebas: 20% / 10% / 5%. Los demás puestos: 30% / 20% / 10%. El sueldo por horas se calcula aparte.</span>
+                  <span>Mecánico en pruebas: 23% / 13% / 8%. Los demás puestos: 33% / 23% / 13%. El sueldo por horas se calcula aparte.</span>
                 </div>
 
                 <label class="agreement-active-field">
@@ -7804,9 +7804,9 @@ function payrollHourlyRate(hours) {
 function payrollCommissionTiers(positionId) {
   const id = normalizePositionId(positionId);
   if (id === 'trial-mechanic') {
-    return { first: 20, second: 10, excess: 5, label: '20% / 10% / 5%' };
+    return { first: 23, second: 13, excess: 8, label: '23% / 13% / 8%' };
   }
-  return { first: 30, second: 20, excess: 10, label: '30% / 20% / 10%' };
+  return { first: 33, second: 23, excess: 13, label: '33% / 23% / 13%' };
 }
 
 function calculateTieredCommission(profit, positionId) {
