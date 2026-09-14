@@ -7881,6 +7881,9 @@ function updatePayrollCalculationUI(calc = payrollCalculation()) {
 }
 
 function payrollHoursFromRecord(record) {
+  if (record?.manualHoursOverride === true && Number.isFinite(Number(record?.manualHoursWorked))) {
+    return payrollPaidHours(record.manualHoursWorked);
+  }
   if (record?.attendanceSource === 'discord' && Number.isFinite(Number(record?.attendanceSeconds))) {
     return payrollPaidHours(Number(record.attendanceSeconds) / 3600);
   }
@@ -7913,6 +7916,7 @@ function renderPayrollPanel() {
   payrollBaseSalary.value = '0';
   payrollCommission.value = '0';
   const attendanceSynced = record?.attendanceSource === 'discord';
+  const manualHoursOverride = record?.manualHoursOverride === true;
   payrollHours.value = String(payrollHoursFromRecord(record));
   payrollBankAccount.value = record?.bankAccount ?? defaults.bankAccount ?? '';
   payrollPaymentMethod.value = record?.paymentMethod || '';
@@ -7920,9 +7924,11 @@ function renderPayrollPanel() {
   const canEditPayroll = hasPermission('payroll-edit');
   payrollPanel.classList.toggle('payroll-readonly', !canEditPayroll);
   payrollPosition.disabled = !canEditPayroll;
-  payrollHours.disabled = !canEditPayroll || attendanceSynced;
+  payrollHours.disabled = !canEditPayroll;
   payrollHours.title = attendanceSynced
-    ? `Sincronizado desde Discord: ${formatAttendanceDuration(record.attendanceSeconds)}`
+    ? manualHoursOverride
+      ? `Discord registró ${formatAttendanceDuration(record.attendanceSeconds)} · usando ajuste manual de ${payrollHours.value} h pagadas`
+      : `Discord registró ${formatAttendanceDuration(record.attendanceSeconds)} · puedes corregir manualmente las horas pagadas`
     : 'Horas pagadas de la semana';
   payrollBankAccount.disabled = !canEditPayroll;
   savePayrollSettings.hidden = !canEditPayroll;
@@ -7957,7 +7963,9 @@ function renderPayrollPanel() {
   } else if (attendanceSynced) {
     setStatus(
       payrollStatus,
-      `Horas sincronizadas desde Discord: ${formatAttendanceDuration(record.attendanceSeconds)} registradas · ${payrollHours.value} h pagadas.`,
+      manualHoursOverride
+        ? `Discord registró ${formatAttendanceDuration(record.attendanceSeconds)} · ajuste manual aplicado: ${payrollHours.value} h pagadas.`
+        : `Horas sincronizadas desde Discord: ${formatAttendanceDuration(record.attendanceSeconds)} registradas · ${payrollHours.value} h pagadas. Puedes corregirlas manualmente si hace falta.`,
       'ok'
     );
   } else if (profile.discordId) {
@@ -7993,6 +8001,10 @@ async function persistMechanicPayrollSettings() {
   const calc = payrollCalculation();
   const key = payrollRecordKey(selectedHistoryUserId, selectedWeekKey);
   const existing = currentPayrollRecord();
+  const syncedPaidHours = existing?.attendanceSource === 'discord' && Number.isFinite(Number(existing?.attendanceSeconds))
+    ? payrollPaidHours(Number(existing.attendanceSeconds) / 3600)
+    : null;
+  const manualHoursOverride = syncedPaidHours !== null && calc.hours !== syncedPaidHours;
 
   const profile = mechanicProfiles.find(p => p.uid === selectedHistoryUserId);
   if (profile) {
@@ -8015,6 +8027,8 @@ async function persistMechanicPayrollSettings() {
         baseSalary: calc.base,
         hoursWorked: calc.hours,
         paidHours: calc.hours,
+        manualHoursOverride,
+        manualHoursWorked: manualHoursOverride ? calc.hours : null,
         hourlyRate: calc.hourlyRate,
         commissionPercent: calc.effectivePercent,
         commissionTier1Percent: calc.commissionTiers.first,
@@ -8060,13 +8074,21 @@ async function markSelectedPayrollPaid() {
 
   const calc = payrollCalculation();
   const now = new Date();
+  const existing = currentPayrollRecord();
+  const syncedPaidHours = existing?.attendanceSource === 'discord' && Number.isFinite(Number(existing?.attendanceSeconds))
+    ? payrollPaidHours(Number(existing.attendanceSeconds) / 3600)
+    : null;
+  const manualHoursOverride = syncedPaidHours !== null && calc.hours !== syncedPaidHours;
   const record = {
+    ...(existing || {}),
     userId: selectedHistoryUserId,
     userName: selectedHistoryUserName || selectedMechanicProfile?.name || '',
     weekKey: selectedWeekKey,
     baseSalary: calc.base,
     hoursWorked: calc.hours,
     paidHours: calc.hours,
+    manualHoursOverride,
+    manualHoursWorked: manualHoursOverride ? calc.hours : null,
     hourlyRate: calc.hourlyRate,
     commissionPercent: calc.effectivePercent,
     commissionTier1Percent: calc.commissionTiers.first,
